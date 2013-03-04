@@ -1,3 +1,4 @@
+require 'bundler/setup'
 require 'rspec/expectations'
 require_relative '../lib/todo_list'
 require_relative '../lib/exceptions'
@@ -27,7 +28,7 @@ describe TodoList do
     list.last.to_s.should == item_description
   end
 
-  it "should not have the added item completed" do
+  it "should have the added item uncompleted" do
     list << item_description
     list.completed?(0).should be_false
   end
@@ -49,7 +50,7 @@ describe TodoList do
       list.completed?(0).should be_false
     end
 
-    it "should change the state of the completed item" do
+    it "should change the state of a completed item" do
       list.complete(0)
       list.completed?(0).should be_true
     end

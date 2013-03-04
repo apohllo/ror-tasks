@@ -390,12 +390,12 @@ proper exceptions are raised in specific erroneous contexts.
 
   `bundle`
 
-7. Look at the [source code of the test definition](task-1/spec/todo_list.rb)
+7. Look at the [source code of the test definition](spec/todo_list.rb)
 8. Run the tests with:
 
   `rspec spec/todo_list.rb --format doc --color`
 
-9. Implement the [TodoList](task-1/lib/todo_list.rb) in order to fulfil the
+9. Implement the [TodoList](lib/todo_list.rb) in order to fulfil the
   test requirements.
 10. Write the following test definitions:
   * returning of completed items
@@ -415,9 +415,25 @@ proper exceptions are raised in specific erroneous contexts.
   ```
 
   * sorting the items by name
-11. Implement the `TodoClass` according to the above tests.
-12. Upload your changes to your github repository.
+11. Expand the implemented tests for typical, unusual and erroneous conditions.
+12. Implement the `TodoClass` according to the defined tests.
+13. Upload your changes to your github repository.
 
 ## Homework ##
 
-TODO
+Consider the following application - a virtual wallet allowing for buying and
+selling stock in several currencies. 
+
+A user:
+* can supply arbitrary amount of many in any of the defined currencies
+* can convert available money from one currency to another according to a currency 
+  exchange table
+* can buy and sell stocks according to stock exchange rates
+* can demand money to be transfered back to his/her bank account
+
+Consider what classes are needed to implement such an application. Select one of
+these class, write RSpec tests for this class and implement the class according
+to the tests.
+
+The implementation should be stored in `home-1` directory in the main directory
+of this project.
