@@ -86,7 +86,8 @@ be understandable for the client without clarification. As a result it should
 cover sentences such as 'When I click the "Ok" button, a green message appears'.
 
 This can be achieved using regular RSpec tests or test-frameworks dedicated for
-writing acceptance tests, such as Cucumber. In Cucumber the definition of the
+writing acceptance tests, such as [Cucumber](http://cukes.info/). 
+In Cucumber the definition of the
 test is written in semi-structured English (or several other languages) and
 follows Given-When-Then pattern, which allows to state the pre-conditions, the
 conditions and the expected results of the system behavior. As such it allows
@@ -110,4 +111,32 @@ of the system is prepared.
 
 ### Performance tests ###
 
+The performance tests are written in order to measure and improve the
+performance of the system. They usually concentrate on the critical features of
+the systems, i.e. these which are most frequently called and these that are the
+slowest. In most cases such test report the time to run given test. Less
+frequently they report the memory consumption or other performance related 
+measures (e.g. the number of opened files or sockets, etc.). Their purpose is
+to ensure that given feature will not run for too much time. They also ensure
+that changes made to the system will not incur its performance. 
+
+It should be noted that performance testing unlike other types of tests, are 
+environment dependant so they are usually run on a dedicated system (as much
+similar to the production system as possible) in order to get reproducible and
+reliable results. What is more the results of these tests are archived in order
+to compare previous results with the current performance.
+
 ### Regression tests ###
+
+The last type of tests are regression tests. This tests are written whenever an
+error is spotted in a running application (either in staging or in production
+environment). These tests are similar to integration tests, since they cover the
+interaction between different pieces of the system. The primary difference is
+that they usually cover very unusual scenarios. It is due to the fact, that when
+the scenario is typical, it becomes the part of the unit test (i.e. part of the
+specification of the system or a given class). But in both cases the original
+scenario that triggered the error should be registered in form of a test and
+never removed. This will ensure that the problem will not appear in the future.
+
+Regression test, like acceptance tests are usually run when the new version of
+the system is publicly released.
