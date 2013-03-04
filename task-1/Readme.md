@@ -190,8 +190,8 @@ end
 
 The set of **variables** used in the test is introduced using the `let`
 key-word. This construction is particularly useful, when we need different
-values of the variables in different contexts. E.e. if we initialize the
-TodoList with some items we might use the following definitions:
+values of the variables in different contexts. E.g. if we initialize the
+`TodoList` with some items we might use the following definitions:
 
 ```ruby
 describe TodoList do
@@ -201,7 +201,7 @@ describe TodoList do
   # in this context the TodoList is initialized with an empty list of items
 
   describe "with one item" do
-    let(:items)   { ["But toilet paper"] }
+    let(:items)   { ["Buy toilet paper"] }
 
     # in this context the TodoList is initialized with a list of items
     # containing one element
@@ -220,4 +220,38 @@ the new value is used. As a result we does not have to define all the variables,
 but only these that are different from the surrounding context (as in the
 example above). 
 
-### Tests ### 
+There is one special variable, which is called `subject` - this is the variable
+containing the object under testing. By default this is the instance of the
+class under testing obtained by calling the constructor of the class without any
+arguments. In many circumstances this is not enough, so we can define the
+subject explicitly:
+
+```ruby
+describe TodoList do
+  # The subject variable is equal to TodoList.new
+end
+
+describe TodoList do
+  subject       { TodoList.new(items) } # user-defined subject
+  let(:items)   { [] }
+end
+```
+
+The primary difference between the `let` and `subject` is that we do not have to 
+pass the name of the variable - with this respect the syntax is the same. The
+value of the variable is the value of the passed block of code. But subject has
+special purpose in tests - we may write concise tests for the subject. This will
+be shown later.
+
+In the recent version of RSpec an extension for the `subject` macro was
+introduced - it also accepts the name of the variable. In such a case, there are
+two variables - `subject` and the other whose name is defined in the call. This
+is motivated by the fact, that tests with `subject` variable name are less
+meaningful. E.g. `subject.should_no be_empty` is less meaningful than
+`list.should_not be_empty`. Still in the second scenario we want an indication
+of the object under testing, that is why it is available as the `subject`.
+This problem will be covered in the following examples.
+
+### Tests ###
+
+
