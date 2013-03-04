@@ -143,7 +143,7 @@ the system is publicly released.
 
 ## RSpec unit tests ##
 
-There are two modules of RSpec that particularly important for writing unit
+There are two modules of RSpec that are particularly important for writing unit
 tests:
 * RSpec core 
 * RSpec expectations
@@ -322,7 +322,7 @@ discussion of this problem).
 As it was shown above, the primary feature of RSpec is the set of macros, that
 allows for writing tests using a Domain Specific Language (DSL). Such tests are
 easy to read and understand. What is more we can obtain the documentation of the
-class under testing automatically. But the second feature of RSpec, which well
+class under testing automatically. But the second feature of RSpec, which is well
 connected with previous one, is the set of defined *expectations*. The
 expectations are macros used to define the expected behavior of the objects
 under testing. 
@@ -352,7 +352,7 @@ The above tests check if the result of `size` call is the same as zero.
 **Predicate** expectation is used to check if the object possess given feature.
 This expectation uses the common Ruby idiom of methods that end with a question
 mark, i.e. `empty?`. To write expectation testing such features, we have to
-remote the question mark and prepend the name of the method with `be_`, so
+remove the question mark and prepend the name of the method with `be_`, so
 `empty?` becomes `be_empty`. This feature was illustrated earlier.
 
 **Exception** expectations are used to check if given exception is raised in the
@@ -374,11 +374,47 @@ end
 The `InvalidArgument` exception is not available in Ruby, so it must be defined
 in our system. The expectations concerning errors should be specific - passing
 Exception as the expected error will result in tests, that do not define any
-behavior. If there is any kind of an error, the expectation will be met, which
+behavior. If there is any kind of error, the expectation will be met, which
 is wrong. So we have to devise specific types of exceptions for different types
 of errors that might be produced by our system. And the we should check that
-proper exceptions are raised in specific erroneous conditions.
+proper exceptions are raised in specific erroneous contexts.
 
-## Exercise ##
+## Exercises ##
+
+1. Register at github.
+2. Fork this project.
+3. Clone **your project** to the lab computer.
+4. Create and switch to **task-1** branch.
+5. Change directory to `task-1`
+6. Update project dependencies
+
+  bundle
+
+7. Look at the [source code of the test definition](task-1/spec/todo_list.rb)
+8. Run the tests with:
+
+  rspec spec/todo_list.rb --format doc --color
+
+9. Implement the [TodoList](task-1/lib/todo_list.rb) in order to fulfil the
+  test requirements.
+10. Write the following test definitions:
+  * returning of completed items
+  * returning of uncompleted items
+  * removal of an individual item
+  * removal of all completed items
+  * reverting order of two items
+  * reverting the order of all items
+  * toggling the state of an item
+  * setting the state of the item to uncompleted
+  * changing the description of an item
+  * conversion of the list to text with the following format
+  ```
+  - [ ] Uncompleted item
+  - [x] Completed item
+  ```
+  * sorting the items by name
+11. Implement the `TodoClass` according to the above tests.
+
+## Homework ##
 
 TODO
