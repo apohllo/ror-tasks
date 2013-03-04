@@ -316,3 +316,69 @@ one. Although it is perfectly legal to reference the `subject` in the second
 case, the test is less explicit and less meaningful (see 
 [better specs](https://github.com/andreareginato/betterspecs/issues/7) for a
 discussion of this problem). 
+
+### Expectations ###
+
+As it was shown above, the primary feature of RSpec is the set of macros, that
+allows for writing tests using a Domain Specific Language (DSL). Such tests are
+easy to read and understand. What is more we can obtain the documentation of the
+class under testing automatically. But the second feature of RSpec, which well
+connected with previous one, is the set of defined *expectations*. The
+expectations are macros used to define the expected behavior of the objects
+under testing. 
+
+The [documentation of RSpec
+expectations](http://rubydoc.info/gems/rspec-expectations/frames) gives
+comprehensive list of them. Here we only introduce several important and most 
+commonly used expectations.
+
+**Equivalence** expectation is used to check the equivalence of two objects. 
+It uses Ruby equivalence method `==` to check if the objects are "the same",
+e.g.:
+
+```ruby
+describe TodoList do
+  subject(:list)      { TodoList.new(items) }
+  let(:items)         { [] }
+  
+  it "has 0 size" do
+    list.size.should == 0
+  end
+end
+```
+
+The above tests check if the result of `size` call is the same as zero.
+
+**Predicate** expectation is used to check if the object possess given feature.
+This expectation uses the common Ruby idiom of methods that end with a question
+mark, i.e. `empty?`. To write expectation testing such features, we have to
+remote the question mark and prepend the name of the method with `be_`, so
+`empty?` becomes `be_empty`. This feature was illustrated earlier.
+
+**Exception** expectations are used to check if given exception is raised in the
+given (erroneous) context. This is particularly important for writing quality 
+unit tests. As it was stated at the beginning, good unit test cover typical,
+unusual and error conditions. Exception expectations are used to write the last
+type of tests. E.g. we can throw an error if the argument passed to the
+`TodoList` is `nil`:
+
+
+```ruby
+describe TodoList do
+  it "raises exception when invalid argument is passed to the constructor" do
+    expect { TodoList.new(nil) }.to raise_error(InvalidArgument)
+  end
+end
+```
+
+The `InvalidArgument` exception is not available in Ruby, so it must be defined
+in our system. The expectations concerning errors should be specific - passing
+Exception as the expected error will result in tests, that do not define any
+behavior. If there is any kind of an error, the expectation will be met, which
+is wrong. So we have to devise specific types of exceptions for different types
+of errors that might be produced by our system. And the we should check that
+proper exceptions are raised in specific erroneous conditions.
+
+## Exercise ##
+
+TODO
