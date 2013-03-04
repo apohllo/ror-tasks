@@ -24,7 +24,7 @@ type intersects with another. So this taxonomy is not mutually exclusive.
 
 ### Unit tests ###
 
-Unit tests are used to test behavior of a given class. Sometimes they are called
+The unit tests are used to test behavior of a given class. Sometimes they are called
 specs, since a well written unit-test defines the expected behavior of a given
 class. As such unit tests should cover the public interface of the class, i.e.
 all the methods that are publicly available. But in Test Driven Development
@@ -51,11 +51,29 @@ divide by zero (as an error condition).
 In the context of Rails, we usually think of unit tests as tests covering the
 model layer (in fact Rails imposes such an interpretation). However unit test
 are all tests that check or define the behavior of a given class *in isolation*.
-So the test written for a controller might be unit tests, assuming that it 
+So the test written for a controller might be a unit test, assuming that it 
 does not interact with the model layer (this will be covered in the following
 tasks).
 
 ### Integration tests ###
+
+The integration tests are used to test the behavior of the selected aspect of
+the code when the classes interact with each other. In this sense it is an
+opposite of unit tests, where the classes are tested in isolation. Integration
+tests usually spot problems that arise in interaction between different parts
+of the system, such as invalid arguments passed to the methods or invalid
+sequences of calls. 
+
+Because the integration tests usually involve external systems such as the
+database or external web-services, they run much slower than the unit tests.
+This is why unit tests are used to define the expected behavior of the system,
+while integration tests are used mostly to spot the errors. In practice unit
+tests are run whenever new piece of code is implemented, while integration
+tests, depending on the complexity of the system, are run when the code is
+passed to the shared repository or (at least part of them) on a server dedicated
+only to run integration tests. This is particularly important for code which is
+written by many developers, when many parallel changes are contributed to the
+shared repository.
 
 ### Acceptance tests ###
 
