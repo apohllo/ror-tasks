@@ -140,3 +140,84 @@ never removed. This will ensure that the problem will not appear in the future.
 
 Regression test, like acceptance tests are usually run when the new version of
 the system is publicly released.
+
+## RSpec unit tests ##
+
+There are two modules of RSpec that particularly important for writing unit
+tests:
+* RSpec core 
+* RSpec expectations
+
+The core module of RSpec defines the following important concepts:
+* the *class* under testing
+* the set of *variables* used in the tests (they might be re-defined for different
+  contexts)
+* the set of *tests*
+
+### Class ###
+
+The **class** under testing is introduced using the `describe` key-word, e.g.
+
+```ruby
+describe TodoList do
+  # the specification of the TodoList
+end
+```
+
+The same key-word is used to define sub-contexts, e.g. a `TodoList` with one
+item:
+
+```ruby
+describe TodoList do
+  describe "with one item" do
+    # the specification of the TodoList with one item
+  end
+end
+```
+
+The `describe` key-word is aliased as `context` so the above example might be
+described as follows:
+
+```ruby
+describe TodoList do
+  context "with one item" do
+    # the specification of the TodoList with one item
+  end
+end
+```
+
+### Variables ###
+
+The set of **variables** used in the test is introduced using the `let`
+key-word. This construction is particularly useful, when we need different
+values of the variables in different contexts. E.e. if we initialize the
+TodoList with some items we might use the following definitions:
+
+```ruby
+describe TodoList do
+  let(:list)  { TodoList.new(items) }
+  let(:items) { [] }                    # an empty list of items
+
+  # in this context the TodoList is initialized with an empty list of items
+
+  describe "with one item" do
+    let(:items)   { ["But toilet paper"] }
+
+    # in this context the TodoList is initialized with a list of items
+    # containing one element
+  end
+end
+```
+
+The syntax of the `let` macro is as follows - the argument is a symbol, i.e. the
+name of the variable. It also accepts a block of code `{ ... }` which is used to
+initialize the variable. This results in a local variable which might be used in
+any place in the given context, even for defining other variables 
+(e.g. in `TodoList.new(items)`). 
+
+If the variable is redefined in the different context (especially a sub-context), 
+the new value is used. As a result we does not have to define all the variables,
+but only these that are different from the surrounding context (as in the
+example above). 
+
+### Tests ### 
