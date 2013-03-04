@@ -407,14 +407,10 @@ proper exceptions are raised in specific erroneous contexts.
   * toggling the state of an item
   * setting the state of the item to uncompleted
   * changing the description of an item
-  * conversion of the list to text with the following format
-
-  ```
-  - [ ] Uncompleted item
-  - [x] Completed item
-  ```
-
   * sorting the items by name
+  * conversion of the list to text with the following format
+    * `- [ ] Uncompleted item`
+    * `- [x] Completed item`
 11. Expand the implemented tests for typical, unusual and erroneous conditions.
 12. Implement the `TodoClass` according to the defined tests.
 13. Upload your changes to your github repository.
