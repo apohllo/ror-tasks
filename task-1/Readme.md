@@ -384,16 +384,16 @@ proper exceptions are raised in specific erroneous contexts.
 1. Register at github.
 2. Fork this project.
 3. Clone **your project** to the lab computer.
-4. Create and switch to **task-1** branch.
+4. Create and switch to `task-1` branch in git.
 5. Change directory to `task-1`
 6. Update project dependencies
 
-  bundle
+  `bundle`
 
 7. Look at the [source code of the test definition](task-1/spec/todo_list.rb)
 8. Run the tests with:
 
-  rspec spec/todo_list.rb --format doc --color
+  `rspec spec/todo_list.rb --format doc --color`
 
 9. Implement the [TodoList](task-1/lib/todo_list.rb) in order to fulfil the
   test requirements.
@@ -408,12 +408,15 @@ proper exceptions are raised in specific erroneous contexts.
   * setting the state of the item to uncompleted
   * changing the description of an item
   * conversion of the list to text with the following format
+
   ```
   - [ ] Uncompleted item
   - [x] Completed item
   ```
+
   * sorting the items by name
 11. Implement the `TodoClass` according to the above tests.
+12. Upload your changes to your github repository.
 
 ## Homework ##
 
