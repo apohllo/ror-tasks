@@ -237,7 +237,7 @@ describe TodoList do
 end
 ```
 
-The primary difference between the `let` and `subject` is that we do not have to 
+The primary difference between `let` and `subject` is that we do not have to 
 pass the name of the variable - with this respect the syntax is the same. The
 value of the variable is the value of the passed block of code. But subject has
 special purpose in tests - we may write concise tests for the subject. This will
@@ -247,11 +247,72 @@ In the recent version of RSpec an extension for the `subject` macro was
 introduced - it also accepts the name of the variable. In such a case, there are
 two variables - `subject` and the other whose name is defined in the call. This
 is motivated by the fact, that tests with `subject` variable name are less
-meaningful. E.g. `subject.should_no be_empty` is less meaningful than
+meaningful. E.g. `subject.should_not be_empty` is less meaningful than
 `list.should_not be_empty`. Still in the second scenario we want an indication
 of the object under testing, that is why it is available as the `subject`.
 This problem will be covered in the following examples.
 
 ### Tests ###
 
+The tests in RSpec are defined using `it` key-word, e.g.
 
+```ruby
+describe TodoList do
+  subject     { TodoList.new(items) }
+  let(:items) { [] }
+  
+  it "is empty" do
+    subject.should be_empty
+  end
+end
+```
+
+This tests states that a new `TodoList.new` should respond to `empty?` call with
+`true` value. This is verified by `.should be_empty` call. Although it might not
+be obvious how this is achieved (it is covered in the section regarding
+*expectations*), the example is easy to read and understand. We can read it as
+follows: "A (fresh) TodoList is empty". What is more, we can obtains such a
+description automatically by running RSpec (we will show that later). 
+
+The syntax of `it` is as follows - it accepts the name of the test ("is empty")
+followed by a block of code defining the test. The tests contains expectations
+concerning the subject under the test.
+
+For short tests (like the one above) the syntax might be abbreviated:
+
+```ruby
+describe TodoList do
+  subject     { TodoList.new(items) }
+  let(:items) { [] }
+  
+  it { should be_empty }
+end
+```
+
+The semantics of the test is the same, but its definition is shorter. What is
+more, we omitted the `subject` variable, however the test relies on its proper
+definition. 
+
+If we want to mix verbose and concise style tests it is a good idea to give 
+the subject a different name, which reflects its "nature", e.g. 
+
+```ruby
+describe TodoList do
+  subject(:list)      { TodoList.new(items) }
+  let(:items)         { [] }
+  
+  it { should be_empty }
+
+  it "is not empty when an item is added" do
+    list << "Buy toilet paper"
+    list.should_not be_empty
+  end
+end
+```
+
+In this case the object under testing is available both as `subject` and `list`.
+The first variable is used in the concise test, while the second in the verbose
+one. Although it is perfectly legal to reference the `subject` in the second
+case, the test is less explicit and less meaningful (see 
+[better specs](https://github.com/andreareginato/betterspecs/issues/7) for a
+discussion of this problem). 
