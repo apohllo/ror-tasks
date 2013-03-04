@@ -77,6 +77,37 @@ shared repository.
 
 ### Acceptance tests ###
 
+The acceptance tests are tests developed to satisfy the exact requirements of
+the client. For instance if the client delivers a specification of the system
+behavior, this specification should be base for the acceptance tests. The most
+important feature of acceptance tests is its language - it should be the client
+language, not the language used by the developers. The acceptance tests should
+be understandable for the client without clarification. As a result it should
+cover sentences such as 'When I click the "Ok" button, a green message appears'.
+
+This can be achieved using regular RSpec tests or test-frameworks dedicated for
+writing acceptance tests, such as Cucumber. In Cucumber the definition of the
+test is written in semi-structured English (or several other languages) and
+follows Given-When-Then pattern, which allows to state the pre-conditions, the
+conditions and the expected results of the system behavior. As such it allows
+the non-technical participants of the project, to understand and even write the
+specification. 
+
+A different way of specifying acceptance tests is using the browser and
+frameworks such as Selenium for recording the expected behavior of the system.
+In the recording phase a user clicks through the interface and provides the
+required data. She also defines the expected behavior of the system (such as
+appearance of a text message, and the like. 
+In the testing phase the test is run automatically by replying the interaction 
+with the browser and by checking the defined conditions. 
+
+Such tests are similar to the integration tests, since usually they cover many
+classes of the system. The difference is that, they are taking the user
+perspective, so in many cases they will not cover all invalid data that might be
+supplied to the system. It should be also noted, that the acceptance tests run
+with Selenium are very slow, so they are usually run only when the new release
+of the system is prepared.
+
 ### Performance tests ###
 
 ### Regression tests ###
