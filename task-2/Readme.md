@@ -118,11 +118,11 @@ providing the indirect inputs for the tested class. Although in both tests the
 result of that call is expected to be different, since the *indirect* input of
 the test (i.e. the value returned by the database) is different.
 
-Imagine how complicated would be this scenario, if we have to use the real
+Imagine how complicated this scenario would be, if we have to use the real
 database implementation. For instance, we would have to add a special option
-for the database to produce invalid results. This would have to implemented in
+for the database to produce invalid results. This would have to be implemented in
 the database, but the purpose of that option would be limited only to testing -
-very bad idea. In contrast - in the above code we only change the value returned
+a very bad idea. In contrast - in the above code we only change the value returned
 by the test double and everything works as expected. What is more, the change
 that influenced the behavior of the `TodoList` is directly observable, making
 the test easy to understand.
@@ -132,7 +132,97 @@ the test easy to understand.
 Mocks are very similar to stubs, i.e. they allow for defining values returned
 for particular messages. The primary difference between stubs and mocks is that
 mocks provide additional layer of assertions - they are used to check the
-*indirect outputs* of the tested class. 
+*indirect outputs* of the tested class. This is achieved by *requiring* that
+particular messages will be sent to the cooperating objects or by requiring that
+particular messages *will not* be sent. Although mocks also provide the indirect
+inputs for the test, they primary intent is checking what messages are sent by
+the tested class (i.e. what outputs are produced). So the test will fail not
+only when a direct result of the test (i.e. the value returned by the method
+called in the test) is invalid, but also when the tested object have not
+invoked a particular call.
+
+To illustrate the difference and the importance of mocks let us assume that we
+wish to spam social networks whenever new item is added to our `TodoList` (this
+example is adopted from [Objects on Rails](http://objectsonrails.com) by Avdi 
+Grim). But unlike in the database example, we do not want to depend on the
+result of spamming a social network. This would definitely slowed down our
+application, so this call is probably asynchronous. We just want to make sure
+the particular message is sent to the component responsible for twitting. As a
+result, we cannot check if the message was sent by inspecting the direct result
+of adding a new item to the list. We have to use mocks:
+
+```ruby
+describe TodoList do
+  subject(:list)        { TodoList.new(social_network: network) }
+  let(:description)     { "Buy toilet paper" }
+  let(:add_prefix)      { "I am going to " }
+  let(:complete_suffix) { " is done" }
+  let(:network)         { mock!.spam(prefix + description) { true }.subject }
+
+  it "spams the social network when an item is added" do
+    list << description
+  end
+
+  it "spams the social network when an item is completed" do
+    mock(network).spam(description + complete_suffix) { true }
+
+    list << description
+    list.complete(0)
+  end
+end
+```
+
+In these tests we require that whenever an item is added to the `TodoList` a
+message with a prefix `I am going to ` is sent to our social network. What is
+more, we require that a similar message (with ` is done` suffix) is sent, when
+we complete particular item on the `TodoList`.
+
+As you can see, the syntax of mocks is the same as the syntax of stubs. We can
+use `mock!` to create new object with a mocked method and `mock` to add a new
+mocked method to an existing object. After `mock!` and `mock` comes the name of
+the method with the proper arguments. The result of the method is provided in
+block. 
+
+The difference between stubs and mocks might be observed in the tests
+definitions: in case of mocks we do not have to write assertions concerning the
+direct result of the method call, for the test to be valid. The test will fail
+if the mocked method was not invoked by the tested object. So the creation of a 
+assertion verifying its behavior is an implicit result of mocking the method.
+
+The same behavior cannot be achieved with stubs - since the value returned by
+the social network is ignored, we will not be able to add an assertion on the
+direct result of the method call (or some other assertion checking the state of
+the `TodoList`, like in the database example). We would have to check that the
+cooperating object has changed its state (e.g. contains a new item in its
+queue), but this would be cumbersome and does not work in all scenarios. This is
+exactly the purpose of a mock - to verify that the message was sent.
+
+As a final remark, we should note, that mocks allow for defining how many times
+given method is called. By default it is required that the method is called
+once. Adding `times` to the method chain allows us to specify different number
+of calls.
+
+```ruby
+mock(network).spam("Whaaaa!").times(2) { true }
+```
+
+The above code requires that the social network will be spammed with the
+`Whaaaa!` message two times. This assertion will fail both if the number of
+messages is lower or higher than specified. We can also require that a
+particular message is not sent to the cooperating object, by providing
+`times(0)`. Since this is quite popular scenario it is abbreviated as
+`dont_allow` macro:
+
+```ruby
+mock(network).spam("Whaaaa!").times(0)  # the same as:
+dont_allow(network).spam("Whaaaa!")
+```
+
+In the above example we also skipped the definition of the result of the call.
+This is fairly legal - in such a case the result will be nil and we might assume
+that it is ignored by the tested object.
+
+### Fakes ###
 
 ## Exercises ##
 
