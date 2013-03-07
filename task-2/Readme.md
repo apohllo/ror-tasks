@@ -12,7 +12,7 @@ behavior of other classes, that in normal circumstances would cooperate with the
 class under testing. This is motivated by two assumptions, one that the
 resulting unit test will define only the behavior of the class under testing,
 which helps in fulfilling *single responsibility pattern* and
-the other, that the resulting class will be lest coupled with the other
+the other, that the resulting class will be less coupled with the other
 cooperating classes. The side effect of this approach are faster unit tests,
 which greatly improve developer experience and efficiency.
 
@@ -44,8 +44,10 @@ end
 ```
 
 The argument of the `<<` operator is the direct input of the test. The direct
-input is directly observable in the definition of the test. In contrast, the
-indirect input is not observable in the test definition. For instance - if the
+input is directly observable in the definition of the test. More specifically
+that kind of input is the data which is sent in the messages directly called on
+the tested object.  In contrast, the indirect input is not present in the
+messages sent to the object. For instance - if the
 addition of an item to the `TodoList` would result in calling of the database,
 the result provided by the database (e.g. a `true`/`false` value indicating that
 the data was successfully written on the disk) would become the indirect input
@@ -135,7 +137,7 @@ mocks provide additional layer of assertions - they are used to check the
 *indirect outputs* of the tested class. This is achieved by *requiring* that
 particular messages will be sent to the cooperating objects or by requiring that
 particular messages *will not* be sent. Although mocks also provide the indirect
-inputs for the test, they primary intent is checking what messages are sent by
+inputs for the test, their primary intent is checking what messages are sent by
 the tested class (i.e. what outputs are produced). So the test will fail not
 only when a direct result of the test (i.e. the value returned by the method
 called in the test) is invalid, but also when the tested object have not
@@ -157,7 +159,7 @@ describe TodoList do
   let(:description)     { "Buy toilet paper" }
   let(:add_prefix)      { "I am going to " }
   let(:complete_suffix) { " is done" }
-  let(:network)         { mock!.spam(prefix + description) { true }.subject }
+  let(:network)         { mock!.spam(add_prefix + description) { true }.subject }
 
   it "spams the social network when an item is added" do
     list << description
@@ -186,7 +188,7 @@ block.
 The difference between stubs and mocks might be observed in the tests
 definitions: in case of mocks we do not have to write assertions concerning the
 direct result of the method call, for the test to be valid. The test will fail
-if the mocked method was not invoked by the tested object. So the creation of a 
+if the mocked method was not invoked by the tested object. So the creation of an
 assertion verifying its behavior is an implicit result of mocking the method.
 
 The same behavior cannot be achieved with stubs - since the value returned by
@@ -210,7 +212,7 @@ The above code requires that the social network will be spammed with the
 `Whaaaa!` message two times. This assertion will fail both if the number of
 messages is lower or higher than specified. We can also require that a
 particular message is not sent to the cooperating object, by providing
-`times(0)`. Since this is quite popular scenario it is abbreviated as
+`times(0)`. Since this is a quite popular scenario it is abbreviated as
 `dont_allow` macro:
 
 ```ruby
@@ -222,7 +224,114 @@ In the above example we also skipped the definition of the result of the call.
 This is fairly legal - in such a case the result will be nil and we might assume
 that it is ignored by the tested object.
 
+To sum up: stubs and mocks are utilities used as test doubles. They purpose is
+the replacement of the cooperating objects in the unit test. They provide
+indirect inputs and check the indirect outputs of the object under testing.
+Mocks, unlike stubs allow to verify the number of times given method was called.
+
+As a final remark, we have to note that both mocks and stubs also allow to 
+specify the responses of the cooperating
+objects using wildcard arguments, i.e. arguments that does not directly match
+the arguments that were provided in the test. But this feature is not covered 
+in this document. Check out [the documentation (argument wildcard 
+matchers)](http://rubydoc.info/github/btakita/rr/frames/) for details.
+
 ### Fakes ###
+
+In general fakes are test doubles that are similar in their purpose to stubs and
+mocks, with the difference, that they are manually implemented. Usually they are
+used to provide sophisticated behavior in the test, that is not achievable with
+stubs or mocks. Fakes are like simplified implementations of the cooperating
+classes. 
+
+However I do not recommend using such fakes in unit testing. They might be good
+for a limited integration testing, e.g. they might substitute the real database
+with an in-memory fake, which runs much faster. 
+
+But there are also other fakes, that are fairly legal in unit tests - namely the
+fakes used to represent the values that are sent between the cooperating
+objects. As we know in Ruby every value is an object, so the values sent in the
+messages are objects as well. But in many cases we do not need the full object
+behavior for some structure-like objects. We might be only interested in the
+values they encapsulate. 
+
+On the other hand, during the development of the system such values evolve into
+fully defined objects. But the unit test should make as little assumptions about
+the cooperating object as possible. This means that we should limit the number
+of methods called on the counterparts. So if it is possible, we should treat
+structure-like objects always as structures. 
+
+We can achieve this result by creating stubs of such objects, but in the long
+run this is not very convenient. A much better idea is to use Ruby's build-in
+Struct and OpenStruct classes. 
+
+Let us compare the implementation of a test which defines structure-like objects
+using stubs and the Struct class.
+
+Stub-based implementation:
+
+```ruby
+describe TodoList do
+  subject(:list)        { TodoList.new() }
+  let(:item)            { item = stub!.title { tile }.subject
+                          item.stub.description { description }
+                          item
+                        }
+  let(:title)           { "Shopping" }
+  let(:description)     { "Go to Tesco to buy toilet paper and a toothbrush." }
+
+  it "accepts new item with a title and a description" do
+    list << item
+    list.should_not be_empty
+  end
+end
+```
+
+Struct-based implementation:
+
+```ruby
+  subject(:list)        { TodoList.new() }
+  let(:item)            { Struct.new(:title,:description).new(title,description) } 
+  let(:title)           { "Shopping" }
+  let(:description)     { "Go to Tesco to buy toilet paper and a toothbrush." }
+
+  it "accepts new item with a title and a description" do
+    list << item
+    list.should_not be_empty
+  end
+```
+
+If you are not familiar with the `Struct` Ruby class, here is a short
+introduction. The call to `Struct.new(:title,:description)` creates new *class*,
+that has a predefined constructor and accessors - both for the title and the
+description. You can cache that class by assigning it to a variable, e.g. 
+`item_class = Struct.new(:title,:description)`. The you can create new instance
+by calling `item = item_class.new("Some title", "Some description")`. This item
+will have accessors defined for the `:title` and the `:description`, i.e. 
+
+```ruby
+item_class = Struct.new(:title,:description)
+item = item_class.new("Some title", "Some description")
+item.title                # => "Some title"
+item.description          # => "Some description"
+item.title = "New title"  # now item.title is "New title"
+```
+
+In the above test we used a short-cut
+`Struct.new(:title,:description).new(title,description)` since we don't need the
+class to be cached. But the semantics is the same as in the code above.
+
+As you can see in the tests the behavior of the object under the `item` variable
+is the same both in stubbed version of the test and in the version that uses
+fake (i.e. `Struct`). But in the second version of the test, the role of the
+`item` is more explicit - looking at its definition it is clear that it is a
+value-like object. 
+
+A similar behavior might be achieved with the `OpenStruct` class, that is also
+available in Ruby. The difference is that in `OpenStruct` whatever you send to
+the object, it will be returned. It means that the accessors are defined
+on-the-fly. However I do not recommend using `OpenStruct` in tests, since they
+are much more flexible, thus chasing the bugs in the tests might be much harder.
 
 ## Exercises ##
 
