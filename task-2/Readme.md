@@ -263,7 +263,7 @@ structure-like objects always as structures.
 
 We can achieve this result by creating stubs of such objects, but in the long
 run this is not very convenient. A much better idea is to use Ruby's build-in
-Struct and OpenStruct classes. 
+Struct class. 
 
 Let us compare the implementation of a test which defines structure-like objects
 using stubs and the Struct class.
@@ -327,12 +327,41 @@ fake (i.e. `Struct`). But in the second version of the test, the role of the
 `item` is more explicit - looking at its definition it is clear that it is a
 value-like object. 
 
-A similar behavior might be achieved with the `OpenStruct` class, that is also
-available in Ruby. The difference is that in `OpenStruct` whatever you send to
-the object, it will be returned. It means that the accessors are defined
-on-the-fly. However I do not recommend using `OpenStruct` in tests, since they
-are much more flexible, thus chasing the bugs in the tests might be much harder.
-
 ## Exercises ##
+
+1. Create and switch to `task-2` branch in git (make sure all your 
+   changes are commited to the current branch before creating the new one):
+
+   `git checkout -b task-2`
+
+2. Change directory to `task-2`
+3. Update project dependencies
+
+  `bundle`
+
+4. Look at the source code of the test definitions:
+  * [spec/todo_list.rb]
+
+5. Run the tests with (the options for RSpec were moved to [`.rspec` file](.rspec)):
+
+  `rspec spec/todo_list.rb`
+
+6. Implement the [classes](lib/) in order to fulfil the test requirements.
+7. Write the following test definitions:
+  * returning of completed items
+  * returning of uncompleted items
+  * removal of an individual item
+  * removal of all completed items
+  * reverting order of two items
+  * reverting the order of all items
+  * toggling the state of an item
+  * setting the state of the item to uncompleted
+  * changing the description of an item
+  * sorting the items by name
+  * conversion of the list to text with the following format
+    * `- [ ] Uncompleted item`
+    * `- [x] Completed item`
+8. Implement the classes according to the defined tests.
+9. Upload your changes to your github repository.
 
 ## Homework ##
