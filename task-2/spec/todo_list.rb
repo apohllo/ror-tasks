@@ -73,41 +73,4 @@ describe TodoList do
       list << item
     end
   end
-
-  context "with social network" do
-    subject(:list)      { TodoList.new(db: database, social_networ: network) }
-    let(:prefix)        { "I'm going to " }
-    let(:suffix)        { " is done" }
-    let(:network)       { stub! }
-
-    before do
-      stub(database).add_todo_item(anything) { true }
-    end
-
-    it "should spam the network when new item is added" do
-      mock(network).spam(prefix + title)
-
-      list << item
-    end
-
-    it "should spam the network when an item is completed" do
-      stub(database).get_todo_item(0) { item }
-      stub(database).complete_todo_item(item,true) { true }
-      stub(network).spam(prefix + title)
-      mock(network).spam(title + suffix)
-
-      list << item
-      list.complete(0)
-    end
-
-    context "with empty title of the item" do
-      let(:title)     { "" }
-
-      it "should not spam the network if the item is added" do
-        dont_allow(network).spam(anything)
-
-        list << item
-      end
-    end
-  end
 end

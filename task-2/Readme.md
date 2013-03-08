@@ -360,7 +360,18 @@ value-like object.
 9. Implement the [TodoList](lib/todo_list.rb) in order to fulfil the
   test requirements.
 10. Write the following test definitions:
-  TODO
+  * returning `nil` for the first and the last item if the DB is empty
+  * raising an exception when changing the item state if the item is `nil`
+  * not accepting an item with too short (but not empty) title
+  * accepting of an item with missing description
+  * notifying a social network if an item is added to the list 
+    (you have to provide the social network proxy in the constructor)
+  * notifying a social network if an item is completed
+  * not notifying the social network if the title of the item is missing
+  * notifying the social network if the body of the item is missing
+  * cutting the title of the item when notifying the SN if it is longer than 255 chars
+    (both when adding and completing the item)
+
 11. Implement the classes according to the defined tests.
 12. Upload your changes to your github repository.
 
