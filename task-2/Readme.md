@@ -362,6 +362,7 @@ value-like object.
 10. Write the following test definitions:
   * returning `nil` for the first and the last item if the DB is empty
   * raising an exception when changing the item state if the item is `nil`
+  * not accepting a `nil` item
   * not accepting an item with too short (but not empty) title
   * accepting of an item with missing description
   * notifying a social network if an item is added to the list 
@@ -377,4 +378,19 @@ value-like object.
 
 ## Homework ##
 
-TODO
+Consider the [application form the previous task](../task-1#homework). The
+implementation of the application requires access to external services, such as
+the stock exchange service, bank account service and currency exchange service.
+
+Write the unit tests and implementation of the main class (e.g. a `Wallet`) 
+for the following scenarios:
+* the user sends money from his/her bank account to the virtual wallet
+* the user requests a money to be transfered back to his/her bank account
+* the user changes some amount of money from one currency to another
+* the user buys some stock
+* the user sells some stock
+
+The `Wallet` should contact the cooperating services in order to accomplish the
+scenarios. E.g. it should consult the current exchange rate between two
+currencies or the current price of the stock. The services in the tests should be
+stubbed/mocked.
