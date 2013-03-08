@@ -329,39 +329,41 @@ value-like object.
 
 ## Exercises ##
 
-1. Create and switch to `task-2` branch in git (make sure all your 
+1. Switch to the `master` branch in your respository (make sure all your 
    changes are commited to the current branch before creating the new one):
+
+   `git checkout master`
+
+2. Add my repository as a remote repository named `apohllo`:
+
+   `git remote add apohllo git://github.com/apohllo/ror-tasks.git`
+
+3. Pull changes from my `master` branch:
+
+   `git pull apohllo master`
+
+4. Create and switch to `task-2` branch:
 
    `git checkout -b task-2`
 
-2. Change directory to `task-2`
-3. Update project dependencies
+5. Change directory to `task-2`
+6. Update project dependencies
 
   `bundle`
 
-4. Look at the source code of the test definitions:
-  * [spec/todo_list.rb]
+7. Look at the [source code of the test definition](spec/todo_list.rb)
 
-5. Run the tests with (the options for RSpec were moved to [`.rspec` file](.rspec)):
+8. Run the tests with (the options for RSpec were moved to [`.rspec`](.rspec) file):
 
   `rspec spec/todo_list.rb`
 
-6. Implement the [classes](lib/) in order to fulfil the test requirements.
-7. Write the following test definitions:
-  * returning of completed items
-  * returning of uncompleted items
-  * removal of an individual item
-  * removal of all completed items
-  * reverting order of two items
-  * reverting the order of all items
-  * toggling the state of an item
-  * setting the state of the item to uncompleted
-  * changing the description of an item
-  * sorting the items by name
-  * conversion of the list to text with the following format
-    * `- [ ] Uncompleted item`
-    * `- [x] Completed item`
-8. Implement the classes according to the defined tests.
-9. Upload your changes to your github repository.
+9. Implement the [TodoList](lib/todo_list.rb) in order to fulfil the
+  test requirements.
+10. Write the following test definitions:
+  TODO
+11. Implement the classes according to the defined tests.
+12. Upload your changes to your github repository.
 
 ## Homework ##
+
+TODO
