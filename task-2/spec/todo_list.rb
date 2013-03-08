@@ -1,5 +1,6 @@
 require_relative 'spec_helper'
 require_relative '../lib/todo_list'
+require_relative '../lib/exceptions'
 
 describe TodoList do
   subject(:list)            { TodoList.new(db: database) }
@@ -13,53 +14,53 @@ describe TodoList do
   end
 
   it "should be empty if there are no items in the DB" do
-    stub(db).items_count { 0 }
+    stub(database).items_count { 0 }
     list.should be_empty
   end
 
   it "should not be empty if there are some items in the DB" do
-    stub(db).items_count { 1 }
+    stub(database).items_count { 1 }
     list.should_not be_empty
   end
 
   it "should return its size" do
-    stub(db).items_count { 6 }
+    stub(database).items_count { 6 }
 
     list.size.should == 6
   end
 
   it "should persist the added item" do
-    mock(db).add_todo_item(item) { true }
-    mock(db).get_todo_item(0) { item }
+    mock(database).add_todo_item(item) { true }
+    mock(database).get_todo_item(0) { item }
 
     list << item
     list.first.should == item
   end
 
   it "should persist the state of the item" do
-    stub(db).get_todo_item(0) { item }
-    mock(db).complete_todo_item(item,true) { true }
-    mock(db).complete_todo_item(item,false) { true }
+    stub(database).get_todo_item(0) { item }
+    mock(database).complete_todo_item(item,true) { true }
+    mock(database).complete_todo_item(item,false) { true }
 
     list.toggle_state(0)
     list.toggle_state(0)
   end
 
   it "should fetch the first item from the DB" do
-    mock(db).get_todo_item(0) { item }
+    mock(database).get_todo_item(0) { item }
     list.first.should == item
 
-    mock(db).get_todo_item(0) { nil }
+    mock(database).get_todo_item(0) { nil }
     list.first.should == nil
   end
 
   it "should fetch the last item for the DB" do
-    stub(db).items_count { 6 }
+    stub(database).items_count { 6 }
 
-    mock(db).get_todo_item(5) { item }
+    mock(database).get_todo_item(5) { item }
     list.last.should == item
 
-    mock(db).get_todo_item(5) { nil }
+    mock(database).get_todo_item(5) { nil }
     list.last.should == nil
   end
 
@@ -67,7 +68,7 @@ describe TodoList do
     let(:title)   { "" }
 
     it "should not add the item to the DB" do
-      dont_allow(db).add_todo_item(item)
+      dont_allow(database).add_todo_item(item)
 
       list << item
     end
@@ -80,7 +81,7 @@ describe TodoList do
     let(:network)       { stub! }
 
     before do
-      stub(db).add_todo_item(anything) { true }
+      stub(database).add_todo_item(anything) { true }
     end
 
     it "should spam the network when new item is added" do
@@ -90,8 +91,8 @@ describe TodoList do
     end
 
     it "should spam the network when an item is completed" do
-      stub(db).get_todo_item(0) { item }
-      stub(db).complete_todo_item(item,true) { true }
+      stub(database).get_todo_item(0) { item }
+      stub(database).complete_todo_item(item,true) { true }
       stub(network).spam(prefix + title)
       mock(network).spam(title + suffix)
 
