@@ -5,7 +5,7 @@ require_relative '../lib/exceptions'
 describe TodoList do
   subject(:list)            { TodoList.new(db: database) }
   let(:database)            { stub! }
-  let(:item)                { Struct.new(:title,:description).new(title,description) }
+  let(:item)                { Struct.new(:title,:description,:complete).new(title,description,false) }
   let(:title)               { "Shopping" }
   let(:description)         { "Go to the shop and buy toilet paper and toothbrush" }
 
@@ -39,11 +39,13 @@ describe TodoList do
 
   it "should persist the state of the item" do
     stub(database).get_todo_item(0) { item }
-    mock(database).complete_todo_item(item,true) { true }
-    mock(database).complete_todo_item(item,false) { true }
+    mock(database).complete_todo_item(item,true) { item.complete = true; true }
+    mock(database).complete_todo_item(item,false) { item.complete = false; true }
 
     list.toggle_state(0)
+    item.complete.should == true
     list.toggle_state(0)
+    item.complete.should == false
   end
 
   it "should fetch the first item from the DB" do
