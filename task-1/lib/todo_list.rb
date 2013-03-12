@@ -6,6 +6,10 @@ class TodoList
       raise IllegalArgument
     else
       @items = items
+      @status = []
+      @items.each do |item|
+        @status << false
+      end
     end
   end
       
@@ -29,4 +33,15 @@ class TodoList
       @items.first
     end 
 
+    def complete(index)
+      @status[index] = true
+    end
+  
+    def uncomplete(index)
+      @status[index] = false
+    end
+
+    def completed?(object)
+      true if @status[object] == true
+    end
 end
