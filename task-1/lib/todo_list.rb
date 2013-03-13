@@ -44,4 +44,11 @@ class TodoList
     def completed?(object)
       true if @status[object] == true
     end
+
+    #multiple items
+    def sort
+      @items.sort()
+    end
+
+
 end
