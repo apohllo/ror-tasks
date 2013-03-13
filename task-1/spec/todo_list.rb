@@ -8,6 +8,13 @@ describe TodoList do
   let(:items)               { [] }
   let(:item_description)    { "Buy toilet paper" }
 
+  def compare_lists(output_list, compare_list)
+    output_list.each do |item|
+      break if item != compare_list.shift
+    end
+    compare_list.should be_empty
+  end
+
   it { should be_empty }
 
   it "should raise an exception when nil is passed to the constructor" do
@@ -54,5 +61,62 @@ describe TodoList do
       list.complete(0)
       list.completed?(0).should be_true
     end
+  end
+
+  context "with many itmes" do
+      before:each do
+        list.remove_items
+        list << "Meeting"
+        list << "Phone"
+        list << "Shopping"
+        list << "Carwash"
+        list.completed(0)
+        list.completed(1)
+      end
+    it "should return an array of completed items" do
+      output_list = list.return_completed
+      compare_lists(output_list, ["Meeting","Phone"])
+    end
+
+    it "should return an array of uncompleted items" do
+      output_list = list.return_uncompleted
+      compare_lists(output_list, ["Shopping","Carwash"]) 
+    end
+    
+    it "should remove individual item" do
+      
+    end
+
+    it "should remove all completed items" do
+
+    end
+
+    it "should revert order of two items" do 
+
+    end
+
+    it "shoulde revert all itmes" do
+
+    end
+
+    it "should toggle the state of the item" do
+
+    end
+    
+    it "should set the state of the item to uncompleted" do 
+
+    end
+
+    it "should change the description of an item" do 
+     
+    end
+
+    it "should sort the items by name" do
+
+    end
+
+    it "should do the conversion to text look [ ], [x]" do
+
+    end    
   end
 end
