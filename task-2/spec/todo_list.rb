@@ -55,7 +55,7 @@ describe TodoList do
     list.first.should == nil
   end
 
-  it "should fetch the last item for the DB" do
+  it "should fetch the last item from the DB" do
     stub(database).items_count { 6 }
 
     mock(database).get_todo_item(5) { item }
