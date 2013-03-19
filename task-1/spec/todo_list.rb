@@ -58,21 +58,24 @@ it { should be_empty }
     end
 
     it "should change the state of a completed item" do
-      list.complete(0)
-      list.completed?(0).should be_true
+      list.completed(0)
+      list.completed?(0).should == true
     end
   end
 
   context "with many itmes" do
       before:each do
-        list.remove_items
+	      list.remove_all 
         list << "Meeting"
         list << "Phone"
         list << "Shopping"
         list << "Carwash"
         list.completed(0)
         list.completed(1)
+        list.uncompleted(2)
+        list.uncompleted(3)
       end
+
     it "should return an array of completed items" do
       output_list = list.return_completed
       compare_lists(output_list, ["Meeting","Phone"])
@@ -84,7 +87,8 @@ it { should be_empty }
     end
     
     it "should remove individual item" do
-      list.remove_item()      
+      list.remove_item(0)
+      list.first.should == "Phone"
     end
 
     it "should remove all completed items" do
@@ -95,25 +99,26 @@ it { should be_empty }
     it "should revert order of two items" do 
       list[1].should == "Phone"
       list[2].should == "Shopping"
-      list.revert(1,2)
+      list.reverse(1,2)
       list[1].should == "Shopping"
       list[2].should == "Phone"
     end
 
     it "should revert all itmes" do
-      outpu_list = list.revert
+      output_list = list.reverse
       compare_lists(output_list, ["Carwash","Shopping","Phone","Meeting"])
     end
 
     it "should toggle the state of the item" do
-      list[0].toggle_state
-      list[0].should be_uncompleted
-      list[2].toggle_state
-      list[2].should be_completed
+      list.toggle_state(0)
+      list.completed?(0).should be_false
+      list.toggle_state(2)
+      list.completed?(2).should be_true
     end
     
     it "should set the state of the item to uncompleted" do 
-      list[0].uncompleted
+      list.uncompleted(0)
+      list.completed?(0).should be_false
     end
 
     it "should change the description of an item" do 
