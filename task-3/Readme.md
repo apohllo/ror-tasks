@@ -18,6 +18,21 @@ Write few words about (objectives of the TDD):
 
 ## Exercises
 
+1. Switch to the `master` branch in your respository (make sure all your 
+   changes are commited to the current branch before creating the new one or
+   saved using stash):
+
+   `git checkout master`
+
+
+2. Pull changes from my `master` branch:
+
+   `git pull apohllo master`
+
+3. Implement the rest of the exercise in the respective branches (each part has
+  its own branch).
+
+
 ### Part 1 - unit tests
 
 Consider the following application - a virtual wallet allowing for buying and
