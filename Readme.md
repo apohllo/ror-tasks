@@ -1,6 +1,6 @@
 # Advanced Ruby on Rails course - tasks for the classes #
 
-This project contains tasks for the advanced course in Ruby on Rails. 
+This project contains tasks for the advanced course in Ruby on Rails.
 The scope of the course is as follows:
 
 1. [Introduction to unit testing with Rspec](../../tree/master/task-1).
@@ -21,4 +21,4 @@ The scope of the course is as follows:
 The course is held on the [Jagiellonian
 University](http://www.uj.edu.pl/en_GB/).
 
-The sponsor of the course is [Base](https://getbase.com/).
+The sponsor of the course is [Base](https://getbase.com/careers/).
