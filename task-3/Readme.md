@@ -58,4 +58,7 @@ many responsibilities, move them to separate classes. Think of decoupling and
 cohesion.
 
 The implementation should be constistent with the implementation form the
-part 1.
+part 1. But you can start in a separate branch called `service-mocks` (based on
+the part 1 implementation) in order to separate the changes required for this
+task. If everything works as expected, you can merge this branch with the
+`project` branch.
