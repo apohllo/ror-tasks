@@ -35,10 +35,9 @@ these class, write RSpec tests for this class and implement the class according
 to the tests. At least 10 specs should be defined.
 
 The implementation should be stored in `wallet` directory in the main directory
-of this project.
+of this project. It should be developed in a separate git branch called `project`.
 
 ### Part 2 - mocks and stubs
-
 
 The implementation of the application requires access to external services, such as
 the stock exchange service, bank account service and currency exchange service.
@@ -54,7 +53,9 @@ for the following scenarios:
 The `Wallet` should contact the cooperating services in order to accomplish the
 scenarios. E.g. it should consult the current exchange rate between two
 currencies or the current price of the stock. The services in the tests should be
-stubbed/mocked.
+stubbed/mocked. Listen to your tests. If you think that the `Wallet` class has
+many responsibilities, move them to separate classes. Think of decoupling and
+cohesion.
 
 The implementation should be constistent with the implementation form the
 part 1.
