@@ -402,8 +402,8 @@ proper exceptions are raised in specific erroneous contexts.
   * returning of uncompleted items
   * removal of an individual item
   * removal of all completed items
-  * reverting order of two items
-  * reverting the order of all items
+  * reversing order of two items
+  * reversing the order of all items
   * toggling the state of an item
   * setting the state of the item to uncompleted
   * changing the description of an item
@@ -414,22 +414,3 @@ proper exceptions are raised in specific erroneous contexts.
 11. Expand the implemented tests for typical, unusual and erroneous conditions.
 12. Implement the `TodoClass` according to the defined tests.
 13. Upload your changes to your github repository.
-
-## Homework ##
-
-Consider the following application - a virtual wallet allowing for buying and
-selling stock in several currencies. 
-
-A user:
-* can supply arbitrary amount of many in any of the defined currencies
-* can convert available money from one currency to another according to a currency 
-  exchange table
-* can buy and sell stocks according to stock exchange rates
-* can demand money to be transfered back to his/her bank account
-
-Consider what classes are needed to implement such an application. Select one of
-these class, write RSpec tests for this class and implement the class according
-to the tests.
-
-The implementation should be stored in `home-1` directory in the main directory
-of this project.
