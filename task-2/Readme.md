@@ -375,22 +375,3 @@ value-like object.
 
 11. Implement the classes according to the defined tests.
 12. Upload your changes to your github repository.
-
-## Homework ##
-
-Consider the [application form the previous task](../task-1#homework). The
-implementation of the application requires access to external services, such as
-the stock exchange service, bank account service and currency exchange service.
-
-Write the unit tests and implementation of the main class (e.g. a `Wallet`) 
-for the following scenarios:
-* the user sends money from his/her bank account to the virtual wallet
-* the user requests a money to be transfered back to his/her bank account
-* the user changes some amount of money from one currency to another
-* the user buys some stock
-* the user sells some stock
-
-The `Wallet` should contact the cooperating services in order to accomplish the
-scenarios. E.g. it should consult the current exchange rate between two
-currencies or the current price of the stock. The services in the tests should be
-stubbed/mocked.
