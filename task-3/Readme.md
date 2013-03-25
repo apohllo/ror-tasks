@@ -33,12 +33,12 @@ What principles should be followed when the tests are written?
 First of all the tests should not be written in vacuum. Definitely the first
 tests that should be written are acceptance tests, because they clearly show
 what is the value of the system and they assure, that the promised value is
-actually delivered by the system. So the first step is conversion of the users
+actually delivered by the system. So the first step is the conversion of the users
 stories into acceptance tests. When using tools such as Cucumber, this can be
 even the same process, i.e. system specification IS the acceptance test.
 
 Such tests define the high-level expectations imposed on the system. But making
-this test pass is not immediate. But the system still has to be written. 
+this test pass is not immediate - the system still has to be written. 
 Depending on the number of responsibilities it might cover tens or hundreds of
 classes. In the "old" approach one would start designing the system, using UML
 diagrams and the like. In TDD the design is mostly replaced by writing the
@@ -60,19 +60,94 @@ The second requirement for good tests is combined with the expectation,
 that the emerging classes are implemented according to the "traditional"
 requirements for object oriented systems, that is:
 
-* they fulfill single responsibility principle (SRP)
+* they fulfill single responsibility principle
 * the classes are loosely coupled
 * the classes are highly cohesive
 * they fulfill the law of Demeter
+* they lack duplication
 
+First of all we will explain these principles and then we will show testing
+techniques together with implementation techniques that help to fulfill these
+principles. 
 
-TODO
+### Single responsibility principle (SRP)
 
-Write few words about (objectives of the TDD):
+This principle says that a class should have only one responsibility. What does
+it mean in practice? It means, that the class should not understand messages
+that could be separated into distinct modules. For instance if you have a class
+that is responsible for storing and retrieving data of a blog post from the 
+database, it should no be responsible for parsing the data in order to spot 
+mentions or hashtags before being stored, nor should it be
+responsible for converting the data into JSON when this is needed by the
+presentation layer. 
 
-* delegation
-* inheritance
-* dependency injection
+This is a bit surprising for many Rails developers because Rails implicitly
+encourages developers to pack many responsibilities into classes in the model
+layer. "Fat model, skinny controllers" - do not put any logic into controller,
+put everything into the model layer. That is ok, unless you think that the model
+layer is everything that inherits from ActiveRecord::Base. If you follow that
+"method", then you will end up with classes called "feature envy". They have so
+many responsibilities, that it is hard to say which of them is the primary. This is
+clearly wrong. The code is hard to understand and what is more important - it is
+hard to maintain. 
+
+Getting back to example - definitely there should be a separate class
+responsible for parsing the body of the post and separate class for converting
+the result into JSON. But why? Because it is much easier to reuse such classes
+and it is much easier to understand and maintain them. If it turns out that the
+we have to parse the mentions not only from blog posts but also from comments,
+probably we won't need to change the parser. In the opposite situation we will
+end-up with copy of the parsing method in the comment class, which is
+very bad.
+
+This principle is much easier to fulfill if you look at your tests as a
+specification of behavior and you write your tests before you implement the
+classes. Whenever you wish to add some new code into the class, write a test
+first. Think for a while if the new tests defines new usage scenario of the
+class or is rather a new responsibility. If the second - move the test to a
+separate specification file and write new class for that specification.
+
+### Loose coupling of the classes
+
+In all cases make as little assumptions about the cooperating classes as
+possible. If it is possible, avoid any assumptions (e.g. the existence of such
+cooperators). For instance if you are processing some data (e.g. compute the
+total value of several items) don't make any assumptions where does the data
+come from. So if you have two implementations, one which assumes that the data
+order items are stored in some data repository and the other, where it only
+accepts the data to be processed, the second is definitely better (less coupled)
+than the first.
+
+If you do not use mocks you can check if you are going the right way, by
+explicitly requiring the classes that cooperate with the class that the test is
+written for. Do not require all the classes that are parts of the application.
+If you see that there are many such classes, then it is a signal (quite
+superficial), that the classes are not loosely coupled. 
+
+If you use mocks or stubs, you will figure out that something is going wrong if
+you will have to mock many methods for each test. If this is the case, start
+thinking which calls are really needed and which data could be provided as the
+method parameter. Maybe some data is not needed at all? 
+
+Regarding Rails -- look into your controller class. Look at the most
+sophisticated action. Do you need to interact with all these objects? Maybe you
+could pass the data to one meaningful method (e.g. apply_user_restrictions)
+instead of calling the objects several times (e.g. checking each restriction:
+status, role, login time separately)? 
+
+### High cohesion of the classes
+
+### Law of Demeter
+
+### Avoiding duplication
+
+## Testing and implementation techniques
+
+### delegation
+
+### inheritance
+
+### dependency injection
 
 ## Exercises
 
