@@ -77,7 +77,7 @@ it mean in practice? It means, that the class should not understand messages
 that could be separated into distinct modules. For instance if you have a class
 that is responsible for storing and retrieving data of a blog post from the 
 database, it should no be responsible for parsing the data in order to spot 
-mentions or hashtags before being stored, nor should it be
+mentions or hashtags before the post is stored, nor should it be
 responsible for converting the data into JSON when this is needed by the
 presentation layer. 
 
@@ -86,26 +86,27 @@ encourages developers to pack many responsibilities into classes in the model
 layer. "Fat model, skinny controllers" - do not put any logic into controller,
 put everything into the model layer. That is ok, unless you think that the model
 layer is everything that inherits from ActiveRecord::Base. If you follow that
-"method", then you will end up with classes called "feature envy". They have so
+"method", then you will end up with "feature envy" classes. They have so
 many responsibilities, that it is hard to say which of them is the primary. This is
 clearly wrong. The code is hard to understand and what is more important - it is
 hard to maintain. 
 
-Getting back to example - definitely there should be a separate class
+Getting back to the example - definitely there should be a separate class
 responsible for parsing the body of the post and separate class for converting
 the result into JSON. But why? Because it is much easier to reuse such classes
 and it is much easier to understand and maintain them. If it turns out that the
 we have to parse the mentions not only from blog posts but also from comments,
 probably we won't need to change the parser. In the opposite situation we will
-end-up with copy of the parsing method in the comment class, which is
+end-up with a copy of the parsing method in the comment class, which is
 very bad.
 
 This principle is much easier to fulfill if you look at your tests as a
 specification of behavior and you write your tests before you implement the
 classes. Whenever you wish to add some new code into the class, write a test
 first. Think for a while if the new tests defines new usage scenario of the
-class or is rather a new responsibility. If the second - move the test to a
-separate specification file and write new class for that specification.
+class or is rather a new responsibility. If it is the second case - move the
+test to a separate specification file and write new class for that
+specification.
 
 ### Loose coupling of the classes
 
@@ -113,7 +114,7 @@ In all cases make as little assumptions about the cooperating classes as
 possible. If it is possible, avoid any assumptions (e.g. the existence of such
 cooperators). For instance if you are processing some data (e.g. compute the
 total value of several items) don't make any assumptions where does the data
-come from. So if you have two implementations, one which assumes that the data
+come from. So if you have two implementations, one which assumes that the 
 order items are stored in some data repository and the other, where it only
 accepts the data to be processed, the second is definitely better (less coupled)
 than the first.
@@ -125,7 +126,7 @@ If you see that there are many such classes, then it is a signal (quite
 superficial), that the classes are not loosely coupled. 
 
 If you use mocks or stubs, you will figure out that something is going wrong if
-you will have to mock many methods for each test. If this is the case, start
+you have to mock many methods for each test. If this is the case, start
 thinking which calls are really needed and which data could be provided as the
 method parameter. Maybe some data is not needed at all? 
 
@@ -135,11 +136,103 @@ could pass the data to one meaningful method (e.g. apply_user_restrictions)
 instead of calling the objects several times (e.g. checking each restriction:
 status, role, login time separately)? 
 
+To sum up: loose coupling can be stated ass follows. Limit the number of
+cooperating classes. Limit the number of methods you call on the cooperating
+objects.
+
 ### High cohesion of the classes
+
+On the other hand, the classes should be highly cohesive, i.e. the specification
+of their behaviour should shape something that is coherent, but not limited to a
+tiny functionality. If you have a two classes - one which detects that there are
+hashes in a text and the other which returns their indices you are probably not
+following this principle. Definitely there is a tension between highly decoupled
+and highly cohesive. Try to name the class using domain terminology. If it is
+hard, this might be a sign of a divided class.
 
 ### Law of Demeter
 
-### Avoiding duplication
+This principle is connected with the loose coupling requirement. It says that
+you should restrict the types of receivers of the calls initiated by a method
+call to the following classes:
+* the class the method belongs to
+* the classes of the objects that are accessible via getters of the class
+* the classes of the objects that were passed as the arguments of the method
+* the classes of the objects that were created in that method
+
+Note the words ''types'' and ''method'' in this definition. 
+
+This law is defined specifically to avoid method chains, such as:
+
+```ruby
+class Post < ActiveRecord::Base
+  belongs_to :user
+
+  def user_full_name
+    "#{user.profiles.first.personal_data.name} #{user.profiles.first.personal_data.surname}"
+  end
+end
+```
+
+The method lacks parameter, so we can only play with the `Account` class and the
+`User` class. Why the law is broken here? Because we call something on the
+result of `profiles`. Its class is probably `Profile` (collection) but we call
+`first`, then `personal_data` and finally `surname` on that result. This is bad.
+
+This call chain should be substituted with 
+
+```ruby
+def user_full_name
+  "#{user.name} #{user.surname}"
+end
+```
+(BTW - this method could be moved to the `User` class, but it's much easier to
+spot when its contents is shorter).
+
+What is the source of such method chains? In most of the cases a change in the 
+requirements. Probably, at the beginning the personal data where attached to the
+user. In the course of the development, a profile was introduce, to allow users
+to use several profiles. Then probably some of the data in the profile were
+extracted to form the personal section and some to e.g. invoice section or
+something similar. Anyway it is very easy to find code like that in real
+applications. 
+
+Restricting ourself only to the types of objects present in the Law of Demeter
+helps in keeping the classes less coupled. But doesn't it complicate the
+development of the system? Can we still do things like:
+
+```ruby
+line.chomp.capitalize
+```
+
+Yes, because, the type of result of `chomp` is `String` the same type as `line`.
+So if you had access to `line` which is string, you can call `capitalize` on the
+results of `chomp` since it is `String` as well.
+
+Ok, so what about LoD and tests? You will easily find the pieces that break LoD
+if you use mocks or stubs. If the result provided by some stub is also a stub
+(or a result of a mock is also a mock) you are probably violating this important
+law. Usually this won't happen if you are strictly following TDD. The method
+calls will appear, if you are implementing the method, not when you define its
+behavior. So whenever the implementation "requires" from you to add such a chain
+think twice, if you are not breaking this law.
+
+### Avoiding duplication (DRY)
+
+Avoiding duplication (DRY - dont' repeat yourself) is one of the best known
+principle of object oriented programming. Defining only one place in the system
+that stores given piece of data or captures given structural or computational
+relationship greatly helps in maintaining the system. If there is only one place
+with the definition, there is only one place you have to change if some
+requirement changes. Whenever you wish to copy some piece of code, you should
+think if you stay DRY. 
+
+In traditional OO languages such as Java or C# this principle is often fulfilled
+via inheritance. Put what is common into the parent class, put what is specific
+into the children classes. But this is not the only way to avoid duplication.
+The most underrated method of doing that is delegation. In Ruby you can also use
+modules to extract methods that might be attached to many classes. We will
+discuss this methods in the following section.
 
 ## Testing and implementation techniques
 
@@ -148,6 +241,11 @@ status, role, login time separately)?
 ### inheritance
 
 ### dependency injection
+
+## Further readings
+
+* [Law of Demeter by Avdi Grimm](http://devblog.avdi.org/2011/07/05/demeter-its-not-just-a-good-idea-its-the-law/)
+* [Objects on Rails by Avdi Grimm](http://objectsonrails.com)
 
 ## Exercises
 
