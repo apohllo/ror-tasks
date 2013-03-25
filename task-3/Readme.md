@@ -187,7 +187,7 @@ def user_full_name
 end
 ```
 (BTW - this method could be moved to the `User` class, but it's much easier to
-spot when its contents is shorter).
+spot this problem when its contents is shorter).
 
 What is the source of such method chains? In most of the cases a change in the 
 requirements. Probably, at the beginning the personal data where attached to the
@@ -232,22 +232,191 @@ via inheritance. Put what is common into the parent class, put what is specific
 into the children classes. But this is not the only way to avoid duplication.
 The most underrated method of doing that is delegation. In Ruby you can also use
 modules to extract methods that might be attached to many classes. We will
-discuss this methods in the following section.
+discuss this techniques in the following section.
 
 ## Testing and implementation techniques
 
 ### delegation
 
-### inheritance
+Delegation is a technique beloved by bosses - don't do anything yourself.
+Delegate it to your ... Switching back to programming this means that you pass
+the message that you don't understand or are not willing to understand to some
+of your collaborators. Usually these collaborators are the objects that are
+properties of the object in question. But they might be constructed just in
+order to understand one particular message. Recall the example with the user
+name. This is exactly the kind of cooperation we are talking about. The name of
+the user is needed, when you render the blog `Post`. But the blog `Post` should not
+remember the full name of the user. This would violate the DRY principle. So the
+post delegates the call to the `User` class. 
+
+Another example of this technique was discussed in the `Post` example, when the
+post was supposed to be responsible for parsing the body of a message in order
+to find user mentions and hashtags. This scenario could be accomplished if the
+class responsible for creating the post, created (probably a temporary) instance
+of a message parser and delegated the parsing to that object. 
+
+This technique is so common, that sometimes it is hard to think of it as
+something special. Yet in Ruby we have several libraries, that simplify writing
+the boilerplate code:
+
+* SimpleDelegator
+* Forwardable
+* ActiveSupport
+
+The first one works as follows - the class that inherits from `SimpleDelegator`
+accepts an instance of another class. If that class does not understand some
+message, it delegates the message to the instance passed in the constructor.
+
+```ruby
+require 'delegate'
+
+class TextFormatter < SimpleDelegator
+  def formatted
+    state = self.completed? ? "x" : " "
+    "[#{state}] #{self.title}"
+  end
+end
+
+class Task
+  attr_accessor :title, :completed
+
+  def initialize(title)
+    @title = title
+    @completed = false
+  end
+
+  def completed?
+    self.completed
+  end
+
+  def complete
+    @completed = true
+  end
+end
+
+
+task = TextFormatter.new(Task.new("Buy toilet paper"))
+task.formatted    #=> "[ ] Buy toilet paper"
+task.title        #=> "Buy toilet paper"
+task.completed?   #=> false
+```
+
+The above code shows how we can use `SimpleDelegator` to implement a decorator
+pattern. The decorator pattern is very used to provide different implementations
+of some method in different contexts. In the above example we used a text
+decorator to depict the completed tasks with 'x'. In a different context (e.g. a
+web page) we could use `HTMLFormatter` that would render the completed tasks as
+list items with some CSS class, indicating that they are completed. What is
+important in the example, is that the rendering of an item is not its
+core responsibility. But on the other hand we would like to have access to all
+the methods that are defined in that class. In this case we can use
+`SimpleDelegator`, which passes the methods that are not defined in
+`TextFormatter` to the `Task` class. 
+
+One might think that this is a classical example of inheritance, i.e. that we
+could create `TextTask` class, that would inherit from `Task`. The superficial 
+result would be the same, at least for this short code. But there is one
+subtle difference - the `TextTask` would suggest that this is some special kind
+of task, which is not true. This a task with some additional features, that are
+useful in a particular context. What is more, a decorator can be part of
+independent class hierarchy (like in the above example). These concepts should
+not be confused.
+
+The second library is `Forwardable` - unlike `SimpleDelegator` it is a module,
+so using it requires only extending (mixing-in on the class level) that
+particular module. Its usage is also different - we have to explicitly define
+the methods that are delegated to the cooperating class, e.g.
+
+```ruby
+require 'forwardable'
+
+class User
+  attr_accessor :name
+
+  def initialize(name)
+    @name = name
+  end
+end
+
+class Post
+  attr_accessor :user, :title
+
+  extend Forwardable
+  def_delegator :user, :name, :user_name
+
+  def initialize(title,user)
+    @title = title
+    @user = user
+  end
+end
+
+post = Post.new("UFO over Krakow",User.new("EPI Professor"))
+post.title        #=> "UFO over Krakow"
+post.user_name    #=> "EPI Professor"
+```
+
+The delegation is defined with `def_delegator` and `def_delegators` macros. The
+first macro accepts the element, the call is delegated to (in this case the
+instance variable), the name of the method that is called and the name of the
+method that is delegated. In the above example, `user_name` is delegated to the
+`name` method on the instance variable `@user`.  The second macro is very
+similar, but it allows to define many delegated methods in one pass, but doesn't
+allow to rename them. This module can be used outside of Rails.
+
+The last library is a part of Rails `ActiveSupport` core extensions. They extends
+the many of the core classes (such as `Module`) with additional useful methods.
+`delegate` allows to achieve almost the same effects that the `Forwardable`
+module, but with slightly simplified syntax.
+
+In context of Rails we could rewrite the above example as follows:
+
+```ruby
+
+class User < ActiveRecord::Base
+  # assume that User has a `name` attribute
+  has_many :posts
+end
+
+class Post
+  # assume that Post has a `title` attribute
+  belongs_to :user
+
+  delegate :name, :to => :user, :prefix => true
+end
+
+user = User.new(:name => "EPI Professor")
+post = Post.new(:title => "UFO over Krakow",:user => user)
+post.title        #=> "UFO over Krakow"
+post.user_name    #=> "EPI Professor"
+```
+
+The macro is called `delegate`. It accepts the names of the delegated methods
+and `:to` parameter, which points to the object, the calls are delegated to. It
+accepts the `:prefix` option, which (if true) indicates that the method should
+be prefixed with the name of the object (i.e. `user_name` instead of `name` in
+the above example). It also accepts the `:allow_nil` option, which indicates,
+that a `nil` should be returned if the object is nil. If it is not set, an
+exception will be raised in that case. 
+
+To sum up - there are many methods of delegating the messages to the cooperating
+classes. A simple implementation is definitely the most obvious, but it might
+lead to much boilerplate code. `SimpleDelegator` is best suited for writing
+decorators, since it passes all outstanding messages to the object it decorates.
+`Forwardable` and `ActiveSupport` both allow to selectively delegate messages to
+the cooperating classes making the code more concise and readable.
+
+### inheritance, mixing-in
 
 ### dependency injection
 
 ## Further readings
 
-* [Law of Demeter by Avdi Grimm](http://devblog.avdi.org/2011/07/05/demeter-its-not-just-a-good-idea-its-the-law/)
-* [Objects on Rails by Avdi Grimm](http://objectsonrails.com)
+* ["Object Oriented Software Construction" by Bertrand Meyer](http://www.amazon.com/Object-Oriented-Software-Construction-Book-CD-ROM/dp/0136291554)
+* ["Growing Object-Oriented Software, Guided by Tests" by Steve Freeman](http://www.amazon.com/Growing-Object-Oriented-Software-Guided-Tests/dp/0321503627)
+* ["Objects on Rails" by Avdi Grimm](http://objectsonrails.com)
+* ["Law of Demeter" by Avdi Grimm](http://devblog.avdi.org/2011/07/05/demeter-its-not-just-a-good-idea-its-the-law/)
 
-## Exercises
+## Exercises - virtual wallet application
 
 1. Switch to the `master` branch in your respository (make sure all your 
    changes are commited to the current branch before creating the new one or
@@ -264,7 +433,7 @@ discuss this methods in the following section.
   its own branch).
 
 
-### Part 1 - unit tests
+### Part 1 - acceptance tests
 
 Consider the following application - a virtual wallet allowing for buying and
 selling stock in several currencies. 
@@ -276,14 +445,29 @@ A user:
 * can buy and sell stocks according to stock exchange rates
 * can demand money to be transfered back to his/her bank account
 
-Consider what classes are needed to implement such an application. Select one of
-these class, write RSpec tests for this class and implement the class according
-to the tests. At least 10 specs should be defined.
+Write at least 5 acceptance tests that capture some of the requirements stated
+above. These acceptance tests should help you in identifying the "edge" classes
+that constitute the system. Use RSpec to write the tests. 
 
 The implementation should be stored in `wallet` directory in the main directory
 of this project. It should be developed in a separate git branch called `project`.
+The acceptance test should be stored in `wallet/tests/acceptance` directory.
 
-### Part 2 - mocks and stubs
+
+### Part 2 - unit tests
+
+Consider the classes that were used in the acceptance tests in the previous
+part. Select one of these class, write unit tests for this class and implement
+the class according to the tests. At least 10 specs should be defined.
+
+The unit tests should be written using RSpec and placed in `wallet/tests/specs`
+directory. The implementation should be placed in `wallet/lib` directory.
+When you finish writing the implementation look at the code and check if it
+fulfills the principles stated in introduction. If not, re-factor the code
+accordingly.
+
+
+### Part 3 - mocks and stubs
 
 The implementation of the application requires access to external services, such as
 the stock exchange service, bank account service and currency exchange service.
@@ -303,8 +487,8 @@ stubbed/mocked. Listen to your tests. If you think that the `Wallet` class has
 many responsibilities, move them to separate classes. Think of decoupling and
 cohesion.
 
-The implementation should be constistent with the implementation form the
-part 1. But you can start in a separate branch called `service-mocks` (based on
-the part 1 implementation) in order to separate the changes required for this
-task. If everything works as expected, you can merge this branch with the
-`project` branch.
+The implementation should be consistent with the implementation form the
+part 1 and part 2. But you can start in a separate branch called 
+`service-mocks` (based on the part 2 implementation) in order to separate 
+the changes required for this task. If everything works as expected, you can
+merge this branch with the `project` branch.
