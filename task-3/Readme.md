@@ -136,7 +136,7 @@ could pass the data to one meaningful method (e.g. apply_user_restrictions)
 instead of calling the objects several times (e.g. checking each restriction:
 status, role, login time separately)? 
 
-To sum up: loose coupling can be stated ass follows. Limit the number of
+To sum up: loose coupling can be stated as follows. Limit the number of
 cooperating classes. Limit the number of methods you call on the cooperating
 objects.
 
