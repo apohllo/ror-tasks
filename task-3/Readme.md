@@ -25,8 +25,10 @@ consequences:
 ## How to write good tests?
 
 Assuming that we opted-in for TDD the next question is: how to write good test?
-If TDD is a remedy for software development problem, writing tests should be
+If TDD is a remedy for a software development problem, writing tests should be
 easier than writing the system implementation. But this is not always the case. 
+
+### Start with acceptance tests, continue with unit tests
 
 What principles should be followed when the tests are written? 
 
@@ -37,15 +39,15 @@ actually delivered by the system. So the first step is the conversion of the use
 stories into acceptance tests. When using tools such as Cucumber, this can be
 even the same process, i.e. system specification IS the acceptance test.
 
-Such tests define the high-level expectations imposed on the system. But making
+Such tests define a high-level expectations imposed on the system. But making
 this test pass is not immediate - the system still has to be written. 
 Depending on the number of responsibilities it might cover tens or hundreds of
 classes. In the "old" approach one would start designing the system, using UML
 diagrams and the like. In TDD the design is mostly replaced by writing the
 tests. This is the moment when unit tests come into play. Acceptance tests allow
 for identifying the key entry points of the system - that is the elements the
-external actors of the system play with. So at first the unit tests are written
-for these classes. 
+external actors of the system play with. So the next step after writing the
+acceptance tests is writing the unit tests are written for the identified classes. 
 
 Writing the tests for the "entry" classes allows for the identification of the
 other classes that cooperate with them. For sure this process is not straight
@@ -55,6 +57,101 @@ iterative. Specifying the classes cooperating with the entry classes, we may
 identify further classes, that are required for the implementation. This process
 continues until there are no more cooperating classes to define. This
 requirement is further verified with the acceptance tests.
+
+How an acceptance tests look like? It depends on the testing framework you are
+going to use. Cucumber seems to be best suited for this task, but using RSpec
+custom matchers should give you similar level of readability. For instance if
+you are defining a currency exchange service an acceptance test could look like
+this:
+
+```ruby
+describe "currency exchanger" do
+  describe "user with EUR and PLN accounts" do
+    specify "conversion from EUR to PLN without limit" do
+      set_balance :eur => 100, :pln => 0
+      set_exchange_rate [:eur,:pln] => 4.15
+      convert_money(:eur,:pln)
+      get_balance(:eur).should == 0
+      get_balance(:pln).should == 415
+    end
+
+    specify "conversion from EUR to PLN with limit set to 50" do
+      set_balance :eur => 100, :pln => 0
+      set_exchange_rate [:eur,:pln] => 4.15
+      convert_money_with_limit(:eur,:pln,50)
+      get_balance(:eur).should == 50
+      get_balance(:pln).should == 205.75
+    end
+  end
+end
+```
+
+The acceptance tests are expressed in high-level language. As such they lack
+references to any classes or objects. To make them pass (or at least go in the
+right direction), we have to implement helper methods, that interact with the
+actual objects:
+
+```ruby
+describe "currency exchanger" do
+  def set_balance(accounts)
+    @accounts ||= []
+    accounts.each do |currency,balance|
+      @accounts << Account.new(currency,balance)
+    end
+  end
+
+  def set_exchange_rate(rates)
+    @rates ||= []
+    rates.each do |(from_currency,to_currency),rate|
+      @rates << ExchangeRate.new(from_currency,to_currency,rate)
+    end
+  end
+
+  def convert_money(from_currency,to_currency)
+    exchanger = Exchanger.new(find_account(from_currency),find_account(to_currency),
+      find_rate(from_currency,to_currency))
+    exchanger.convert(:all)
+  end
+
+  def convert_money_with_limit(from_currency,to_currency,limit)
+    exchanger = Exchanger.new(find_account(from_currency),find_account(to_currency),
+      find_rate(from_currency,to_currency))
+    exchanger.convert(limit)
+  end
+
+  def get_balance(currency)
+    find_account(currency).balance
+  end
+
+  def find_account(currency)
+    @accounts.find{|a| a.currency == account }
+  end
+
+  def find_rate(from_currency,to_currency)
+    @rates.find{|r| r.from_currency == from_currency && 
+        r.to_currency == to_currency}
+  end
+end
+```
+
+The core idea behind the helper methods is that they should help to write
+concise and readable tests and to help identify the classes that are the entry
+points of the system. The implementation presented above is not very efficient
+and is subject to change, when the system grows. Especially, taking care of
+accounts and exchange rates should not be the responsibility of the helper
+methods. We can refactor it right now, but we are not forced to. 
+
+The most
+important thing is that we have identified the core classes, that are needed for
+the acceptance test to pass. So we can start writing unit tests for theses
+classes. But we are not bound to that selection of classes till the end
+of the World. We can re-write the helper methods if more classes become
+available (e.g. a class allowing for storing and fining the accounts and
+exchange rates). What is the most important, is the fact that the test
+definitions will not change with the development of the system. They are
+separated from the classes by the helper methods.
+
+### Fulfill OOP principles
 
 The second requirement for good tests is combined with the expectation,
 that the emerging classes are implemented according to the "traditional"
@@ -66,11 +163,10 @@ requirements for object oriented systems, that is:
 * they fulfill the law of Demeter
 * they lack duplication
 
-First of all we will explain these principles and then we will show testing
-techniques together with implementation techniques that help to fulfill these
-principles. 
+First of all we will explain these principles and then we will show
+implementation techniques that help to fulfill these principles. 
 
-### Single responsibility principle (SRP)
+#### Single responsibility principle (SRP)
 
 This principle says that a class should have only one responsibility. What does
 it mean in practice? It means, that the class should not understand messages
@@ -80,6 +176,7 @@ database, it should no be responsible for parsing the data in order to spot
 mentions or hashtags before the post is stored, nor should it be
 responsible for converting the data into JSON when this is needed by the
 presentation layer. 
+
 
 This is a bit surprising for many Rails developers because Rails implicitly
 encourages developers to pack many responsibilities into classes in the model
@@ -100,6 +197,55 @@ probably we won't need to change the parser. In the opposite situation we will
 end-up with a copy of the parsing method in the comment class, which is
 very bad.
 
+So instead of:
+
+```ruby
+class Post < ActiveRecord::Base
+  before_save :parse_body
+
+  def parse_body
+    # parsing code
+  end
+
+  def to_json
+    # JSON conversion
+  end
+end
+```
+
+you should have the  following classes:
+
+```ruby
+class Post < ActiveRecord::Base
+end
+
+class PostParser
+  def initialize(text)
+    # ...
+  end
+
+  # Return hashtags found in the text.
+  def hashtags
+    # ...
+  end
+
+  # Return mentions found in the text.
+  def mentions
+    # ...
+  end
+end
+
+class PostFormatter
+  def initialize(post)
+    # ...
+  end
+
+  def to_json
+    # ...
+  end
+end
+```
+
 This principle is much easier to fulfill if you look at your tests as a
 specification of behavior and you write your tests before you implement the
 classes. Whenever you wish to add some new code into the class, write a test
@@ -108,7 +254,7 @@ class or is rather a new responsibility. If it is the second case - move the
 test to a separate specification file and write new class for that
 specification.
 
-### Loose coupling of the classes
+#### Loose coupling of the classes
 
 In all cases make as little assumptions about the cooperating classes as
 possible. If it is possible, avoid any assumptions (e.g. the existence of such
@@ -140,7 +286,7 @@ To sum up: loose coupling can be stated ass follows. Limit the number of
 cooperating classes. Limit the number of methods you call on the cooperating
 objects.
 
-### High cohesion of the classes
+#### High cohesion of the classes
 
 On the other hand, the classes should be highly cohesive, i.e. the specification
 of their behaviour should shape something that is coherent, but not limited to a
@@ -150,7 +296,7 @@ following this principle. Definitely there is a tension between highly decoupled
 and highly cohesive. Try to name the class using domain terminology. If it is
 hard, this might be a sign of a divided class.
 
-### Law of Demeter
+#### Law of Demeter
 
 This principle is connected with the loose coupling requirement. It says that
 you should restrict the types of receivers of the calls initiated by a method
@@ -234,12 +380,12 @@ The most underrated method of doing that is delegation. In Ruby you can also use
 modules to extract methods that might be attached to many classes. We will
 discuss this techniques in the following section.
 
-## Testing and implementation techniques
+## Use OOP techniques
 
 ### delegation
 
 Delegation is a technique beloved by bosses - don't do anything yourself.
-Delegate it to your ... Switching back to programming this means that you pass
+Delegate it to your subordinate. Switching back to programming this means that you pass
 the message that you don't understand or are not willing to understand to some
 of your collaborators. Usually these collaborators are the objects that are
 properties of the object in question. But they might be constructed just in
@@ -350,9 +496,9 @@ class Post
   end
 end
 
-post = Post.new("UFO over Krakow",User.new("EPI Professor"))
+post = Post.new("UFO over Krakow",User.new("Apohllo"))
 post.title        #=> "UFO over Krakow"
-post.user_name    #=> "EPI Professor"
+post.user_name    #=> "Apohllo"
 ```
 
 The delegation is defined with `def_delegator` and `def_delegators` macros. The
@@ -413,6 +559,7 @@ the cooperating classes making the code more concise and readable.
 
 * ["Object Oriented Software Construction" by Bertrand Meyer](http://www.amazon.com/Object-Oriented-Software-Construction-Book-CD-ROM/dp/0136291554)
 * ["Growing Object-Oriented Software, Guided by Tests" by Steve Freeman](http://www.amazon.com/Growing-Object-Oriented-Software-Guided-Tests/dp/0321503627)
+* ["Clean code: A Handbook of Agile Software Craftsmanship"](http://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882)
 * ["Objects on Rails" by Avdi Grimm](http://objectsonrails.com)
 * ["Law of Demeter" by Avdi Grimm](http://devblog.avdi.org/2011/07/05/demeter-its-not-just-a-good-idea-its-the-law/)
 
