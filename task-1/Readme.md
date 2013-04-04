@@ -398,15 +398,15 @@ proper exceptions are raised in specific erroneous contexts.
 9. Implement the [TodoList](lib/todo_list.rb) in order to fulfil the
   test requirements.
 10. Write the following test definitions:
+  * accessing the items by index
+  * iterating over the items
+  * toggling the state of an item
   * returning of completed items
   * returning of uncompleted items
   * removal of an individual item
   * removal of all completed items
   * reversing order of two items
   * reversing the order of all items
-  * toggling the state of an item
-  * setting the state of the item to uncompleted
-  * changing the description of an item
   * sorting the items by name
   * conversion of the list to text with the following format
     * `- [ ] Uncompleted item`

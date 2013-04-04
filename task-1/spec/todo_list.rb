@@ -50,9 +50,8 @@ describe TodoList do
       list.completed?(0).should be_false
     end
 
-    it "should change the state of a completed item" do
-      list.complete(0)
-      list.completed?(0).should be_true
+    it "should allow to access the item by index" do
+      list[0].should.to_s.should == item_description
     end
   end
 end
