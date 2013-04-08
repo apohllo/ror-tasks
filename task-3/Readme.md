@@ -66,6 +66,8 @@ this:
 
 ```ruby
 describe "currency exchanger" do
+  include ExchangerTestHelper
+
   context "user with EUR and PLN accounts" do
     specify "conversion from EUR to PLN without limit" do
       set_balance :eur => 100, :pln => 0
@@ -92,7 +94,7 @@ right direction), we have to implement helper methods, that interact with the
 actual objects:
 
 ```ruby
-describe "currency exchanger" do
+module ExchangerTestHelper
   def set_balance(accounts)
     @accounts ||= []
     accounts.each do |currency,balance|
