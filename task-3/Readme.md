@@ -66,7 +66,7 @@ this:
 
 ```ruby
 describe "currency exchanger" do
-  describe "user with EUR and PLN accounts" do
+  context "user with EUR and PLN accounts" do
     specify "conversion from EUR to PLN without limit" do
       set_balance :eur => 100, :pln => 0
       set_exchange_rate [:eur,:pln] => 4.15
@@ -282,7 +282,7 @@ could pass the data to one meaningful method (e.g. apply_user_restrictions)
 instead of calling the objects several times (e.g. checking each restriction:
 status, role, login time separately)? 
 
-To sum up: loose coupling can be stated ass follows. Limit the number of
+To sum up: loose coupling can be stated as follows. Limit the number of
 cooperating classes. Limit the number of methods you call on the cooperating
 objects.
 
@@ -530,10 +530,10 @@ class Post
   delegate :name, :to => :user, :prefix => true
 end
 
-user = User.new(:name => "EPI Professor")
+user = User.new(:name => "Apohllo")
 post = Post.new(:title => "UFO over Krakow",:user => user)
 post.title        #=> "UFO over Krakow"
-post.user_name    #=> "EPI Professor"
+post.user_name    #=> "Apohllo"
 ```
 
 The macro is called `delegate`. It accepts the names of the delegated methods
@@ -559,7 +559,7 @@ the cooperating classes making the code more concise and readable.
 
 * ["Object Oriented Software Construction" by Bertrand Meyer](http://www.amazon.com/Object-Oriented-Software-Construction-Book-CD-ROM/dp/0136291554)
 * ["Growing Object-Oriented Software, Guided by Tests" by Steve Freeman](http://www.amazon.com/Growing-Object-Oriented-Software-Guided-Tests/dp/0321503627)
-* ["Clean code: A Handbook of Agile Software Craftsmanship"](http://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882)
+* ["Clean code: A Handbook of Agile Software Craftsmanship" by Robert C. Martin](http://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882)
 * ["Objects on Rails" by Avdi Grimm](http://objectsonrails.com)
 * ["Law of Demeter" by Avdi Grimm](http://devblog.avdi.org/2011/07/05/demeter-its-not-just-a-good-idea-its-the-law/)
 
