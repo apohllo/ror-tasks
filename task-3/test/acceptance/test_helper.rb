@@ -1,21 +1,5 @@
-class Account
-  def initialize(currency,value)
-  end
-end
-
-class ExchangeRate
-  def initialize(source_currency,target_currency,value)
-  end
-end
-
-class CurrencyExchanger
-  def initialize(source_account,target_account,rate)
-  end
-
-  def exchange(amount=nil)
-  end
-end
-
+$:.unshift(File.join(File.dirname(__FILE__),"lib"))
+require 'exchanger'
 
 module CurrencyExchangeHelper
   def set_balance(accounts)
