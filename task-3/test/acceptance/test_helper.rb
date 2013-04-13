@@ -20,18 +20,8 @@ module CurrencyExchangeHelper
 
   def exchange_money(source,target,amount=nil)
     exchanger = CurrencyExchanger.new(find_account(source),find_account(target),
-                                      find_rate(source,target))
-    if amount
-      if amount[source]
-        amount = { :source => amount[source] }
-      elsif amount[target]
-        amount = { :target => amount[target] }
-      else
-        raise "Neither source nor target currency specified as limit." +
-          "[#{source},#{target}] should include one of #{amount.keys.join(",")}"
-      end
-    end
-    exchanger.exchange(amount)
+                                      find_rate(source,target).value)
+    exchanger.exchange(national_currency_to_source_and_target(amount,source,target))
   end
 
   def get_balance(currency)
@@ -39,8 +29,24 @@ module CurrencyExchangeHelper
   end
 
   def find_account(currency)
+    @accounts.find{|a| a.currency == currency }
   end
 
   def find_rate(source,target)
+    @rates.find{|r| r.source_currency == source && r.target_currency == target }
+  end
+
+  private
+  def national_currency_to_source_and_target(amount,source,target)
+    if amount
+      if amount[source]
+        amount = { :source => Money(amount[source]) }
+      elsif amount[target]
+        amount = { :target => Money(amount[target]) }
+      else
+        raise "Neither source nor target currency specified as limit." +
+          "[#{source},#{target}] should include one of #{amount.keys.join(",")}"
+      end
+    end
   end
 end
