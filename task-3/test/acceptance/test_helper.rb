@@ -1,6 +1,8 @@
 $:.unshift(File.join(File.dirname(__FILE__),"lib"))
 require 'exchanger'
 
+include Exchanger
+
 module CurrencyExchangeHelper
   def set_balance(accounts)
     @accounts ||= []
