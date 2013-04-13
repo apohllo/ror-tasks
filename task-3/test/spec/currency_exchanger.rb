@@ -2,6 +2,8 @@ require_relative '../../lib/exchanger/currency_exchanger'
 require_relative '../../lib/exchanger/money'
 require_relative 'spec_helper'
 
+stub_class 'Exchanger::Calculator'
+
 module Exchanger
   describe CurrencyExchanger do
     subject(:exchanger)   { exchanger =

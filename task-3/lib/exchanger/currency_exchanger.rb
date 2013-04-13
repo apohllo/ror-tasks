@@ -40,7 +40,7 @@ module Exchanger
     end
 
     def calculator
-      @calculator
+      @calculator ||= Calculator
     end
   end
 end
