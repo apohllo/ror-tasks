@@ -1,3 +1,5 @@
+require_relative 'test_helper'
+
 """
 Currency exchanger service allows user to exchange currencies.
 
@@ -6,6 +8,8 @@ currency) and exchange the many according to exchange rates.
 """
 
 describe "currency exchanger" do
+  include CurrencyExchangeHelper
+
   context "user with two bank accounts EUR and PLN" do
     specify "exchange of all money from the EUR account" do
       set_balance :eur => "100", :pln => "0"
@@ -15,7 +19,7 @@ describe "currency exchanger" do
       get_balance(:pln).should == "415"
     end
 
-    specify "exchange of money with specified amount of the source currency" do
+    specify "exchange of money with specified amount of EUR" do
       set_balance :eur => "100", :pln => "0"
       set_exchange_rate [:eur,:pln] => "4.15"
       exchange_money :eur, :pln, :eur => "50"
@@ -23,7 +27,7 @@ describe "currency exchanger" do
       get_balance(:pln).should == "205.75"
     end
 
-    specify "exchange of money with specified amount of the target currency" do
+    specify "exchange of money with specified amount of PLN" do
       set_balance :eur => "100", :pln => "0"
       set_exchange_rate [:eur,:pln] => "4.15"
       exchange_money :eur, :pln, :pln => "200.03"
