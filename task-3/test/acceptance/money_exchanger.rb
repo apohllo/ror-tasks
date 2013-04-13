@@ -15,16 +15,16 @@ describe "currency exchanger" do
       set_balance :eur => "100", :pln => "0"
       set_exchange_rate [:eur,:pln] => "4.15"
       exchange_money :eur, :pln
-      get_balance(:eur).should == "0"
-      get_balance(:pln).should == "415"
+      get_balance(:eur).should == "0.00"
+      get_balance(:pln).should == "415.00"
     end
 
     specify "exchange of money with specified amount of EUR" do
       set_balance :eur => "100", :pln => "0"
       set_exchange_rate [:eur,:pln] => "4.15"
-      exchange_money :eur, :pln, :eur => "50"
-      get_balance(:eur).should == "50"
-      get_balance(:pln).should == "205.75"
+      exchange_money :eur, :pln, :eur => "50.00"
+      get_balance(:eur).should == "50.00"
+      get_balance(:pln).should == "207.50"
     end
 
     specify "exchange of money with specified amount of PLN" do

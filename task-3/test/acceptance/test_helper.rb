@@ -7,7 +7,7 @@ module CurrencyExchangeHelper
   def set_balance(accounts)
     @accounts ||= []
     accounts.each do |currency,value|
-      @accounts << Account.new(currency,value)
+      @accounts << Account.new(currency,Money(value))
     end
   end
 
@@ -25,7 +25,7 @@ module CurrencyExchangeHelper
   end
 
   def get_balance(currency)
-    find_account(currency)
+    "%.2f" % find_account(currency).balance
   end
 
   def find_account(currency)
