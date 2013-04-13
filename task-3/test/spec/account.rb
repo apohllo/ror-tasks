@@ -26,5 +26,23 @@ module Exchanger
       account.withdraw(Money("50"))
       account.balance.should == Money("50")
     end
+
+    it "should accept negative deposits" do
+      account.deposit(Money("-50"))
+      account.balance.should == Money("50")
+    end
+
+    it "should accept negative withdrawals" do
+      account.withdraw(Money("-50"))
+      account.balance.should == Money("150")
+    end
+
+    it "should not accept invalid withdrawals" do
+      expect { account.withdraw(nil)}.to raise_error(InvalidArgument)
+    end
+
+    it "should not accept invalid deposits" do
+      expect { account.deposit(nil)}.to raise_error(InvalidArgument)
+    end
   end
 end
