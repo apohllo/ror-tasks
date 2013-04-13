@@ -13,8 +13,8 @@ module Exchanger
 
     private
     def check_amount_and_rate(amount,rate)
-      raise InvalidArgument if rate.nil?
-      raise InvalidArgument if amount.nil?
+      raise InvalidArgument.new("Exchange rate can't be nil") if rate.nil?
+      raise InvalidArgument.new("Amount of money can't be nil") if amount.nil?
     end
 
     def increse_if_lower_than_expected(source_amount,target_amount,rate)
