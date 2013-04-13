@@ -1,10 +1,18 @@
 module Exchanger
   class Account
-    attr_reader :currency
+    attr_reader :currency, :balance
 
-    def initialize(currency,value)
+    def initialize(currency,balance)
       @currency = currency
-      @value = value
+      @balance = balance
+    end
+
+    def withdraw(money)
+      @balance -= money
+    end
+
+    def deposit(money)
+      @balance += money
     end
   end
 end
