@@ -19,6 +19,16 @@ module CurrencyExchangeHelper
   def exchange_money(source,target,amount=nil)
     exchanger = CurrencyExchanger.new(find_account(source),find_account(target),
                                       find_rate(source,target))
+    if amount
+      if amount[source]
+        amount = { :source => amount[source] }
+      elsif amount[target]
+        amount = { :target => amount[target] }
+      else
+        raise "Neither source nor target currency specified as limit." +
+          "[#{source},#{target}] should include one of #{amount.keys.join(",")}"
+      end
+    end
     exchanger.exchange(amount)
   end
 
