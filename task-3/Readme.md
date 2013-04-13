@@ -47,7 +47,7 @@ diagrams and the like. In TDD the design is mostly replaced by writing the
 tests. This is the moment when unit tests come into play. Acceptance tests allow
 for identifying the key entry points of the system - that is the elements the
 external actors of the system play with. So the next step after writing the
-acceptance tests is writing the unit tests are written for the identified classes. 
+acceptance tests is writing the unit tests for the identified classes. 
 
 Writing the tests for the "entry" classes allows for the identification of the
 other classes that cooperate with them. For sure this process is not straight
