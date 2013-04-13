@@ -21,7 +21,8 @@ module Exchanger
 
       context "with target amount below directly computed" do
         let(:target_amount)   { Money("400") }
-        # 95.47 * 4.19 == 400.02
+        # 400 / 4.19 = 95.47
+        # 95.47 * 4.19 = 400.02
         let(:source_amount)   { Money("95.47") }
 
         it "should return directly computed source amount" do
@@ -31,7 +32,8 @@ module Exchanger
 
       context "with target amount above directly computed" do
         let(:target_amount)   { Money("401") }
-        # 95.70 * 4.19 == 400.98
+        # 401 / 4.19 = 95.70
+        # 95.70 * 4.19 = 400.98
         let(:source_amount)   { Money("95.71") }
 
         it "should increase directly computed source amount" do
