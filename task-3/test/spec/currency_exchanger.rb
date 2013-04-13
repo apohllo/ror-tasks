@@ -2,9 +2,14 @@ require_relative '../../lib/exchanger/currency_exchanger'
 require_relative 'spec_helper'
 
 describe CurrencyExchanger do
-  subject(:exchanger)   { CurrencyExchanger.new(source_account,target_account,rate) }
-  let(:source_account)  { mock }
-  let(:target_account)  { mock }
+  subject(:exchanger)   { exchanger =
+                            CurrencyExchanger.new(source_account,target_account,rate)
+                          exchanger.calculator = calculator
+                          exchanger
+  }
+  let(:source_account)  { stub!.balance { source_initial_amount }.subject }
+  let(:target_account)  { stub!.balance { target_initial_amount }.subject }
+  let(:calculator)      { mock }
   let(:rate)            { "4.15" }
   let(:source_initial_amount)   { "100" }
   let(:target_initial_amount)   { "0" }
@@ -16,6 +21,7 @@ describe CurrencyExchanger do
     it "should exchange all money" do
       mock(source_account).withdraw(source_initial_amount)
       mock(target_account).deposit(target_final_amount)
+      mock(calculator).compute_target_amount(source_initial_amount,rate) { target_final_amount }
 
       exchanger.exchange()
     end
@@ -29,12 +35,14 @@ describe CurrencyExchanger do
     it "should exchange the specified amount of money" do
       mock(source_account).withdraw(source_initial_amount)
       mock(target_account).deposit(target_final_amount)
+      mock(calculator).compute_target_amount(limit,rate) { target_final_amount }
 
       exchanger.exchange(:source => limit)
     end
   end
 
   context "with a limit specified for the target currency" do
+    let(:source_amount)         { "48.20" }
     let(:source_final_amount)   { "51.80" }
     let(:target_final_amount)   { "200.03" }
     let(:limit)                 { "200" }
@@ -42,9 +50,10 @@ describe CurrencyExchanger do
     it "should exchange the specified amount of money" do
       mock(source_account).withdraw(source_initial_amount)
       mock(target_account).deposit(target_final_amount)
+      mock(calculator).compute_source_amount(limit,rate) { source_amount }
+      mock(calculator).compute_target_amount(source_amount,rate) { target_final_amount }
 
       exchanger.exchange(:target => limit)
     end
   end
-
 end
