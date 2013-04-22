@@ -1,11 +1,11 @@
 # Understanding ActiveRecord #
 
 Prerequisites:
-* [Rails API](http://api.rubyonrails.org/)
 * [ActiveRecord migrations](http://guides.rubyonrails.org/migrations.html)
 * [ActiveRecord validations and callbacks](http://guides.rubyonrails.org/active_record_validations_callbacks.html)
 * [ActiveRecord associations](http://guides.rubyonrails.org/association_basics.html)
 * [ActiveRecord queries](http://guides.rubyonrails.org/active_record_querying.html)
+* [Rails API](http://api.rubyonrails.org/)
 
 ## Introduction
 
@@ -21,7 +21,7 @@ topics, that are not covered in Rails documentation.
 
 The first feature of ActiveRecord is CRUD interface for the persistence layer.
 
-Definition:
+#### Definition
 
 ```ruby
 # schema migration
@@ -50,7 +50,7 @@ applied.
 On the class part, the definition is very short, as the only requirement is
 inheriting from the `ActiveRecord::Base` class.
 
-Create:
+#### Create
 
 ```ruby
 book = Book.new(:title => 'Ruby')
@@ -75,7 +75,7 @@ classes that inherit from AR::Base and calling their `save` method or by calling
 method accept a hash of key-value pairs, that describe the values of the record
 columns. Appropriate conversion (from Ruby `String`) are performed on-the-fly.
 
-WARNING!
+**WARNING!**
 
 The creation (and update) of objects via mass-assignment (i.e. passing a hash
 of values to `new` or `create` methods) is potentially dangerous, since an
@@ -89,7 +89,7 @@ further reduced by introduction of [strong-parameters
 mechanism](https://github.com/rails/strong_parameters) that operates on the
 controller level.
 
-Read:
+#### Read
 
 ```ruby
 # find by id
@@ -111,7 +111,7 @@ returns the object with the `id` passed as its argument.
 The values of the columns are accessed via methods that are defined dynamically
 and by default are the same as the names of the columns.
 
-Update:
+#### Update
 
 ```ruby
 book = Book.find(1)
@@ -136,7 +136,7 @@ an accessor and call to `save` or via call to `update` method, which works
 similar to the `create` method. Same as with `new` and `create`, `update` is
 subject to the mass-assignment problem.
 
-Destroy:
+#### Destroy
 
 ```ruby
 book = Book.find(1)
@@ -151,7 +151,40 @@ Destroy call deletes given row from a database table. To make the mechanism less
 error prone, the object that was destroyed is frozen, so any changes to it will
 raise an exception.
 
-* query language
+### Associations 
+
+TODO
+
+### Query language
+
+Besides simple CRUD-like access, fetching the data from the persistence layer
+often requires more sophisticated capabilities. This is why SQL and
+relation-algebra were defined. AR simplifies construction of the SQL queries by
+hiding them behind object-oriented query language, which on the one hand exposes
+many of the SQL-capabilities and on the other allows for more flexible query
+construction.
+
+First of all, thanks to associations we do not have to write complex joins,
+since they are added automatically, with appropriate join-conditions. What is
+more we can easily overcome the *n+1 query problem*, by calling `includes` on
+the constructed query. AR will transform the n+1 queries into appropriate number
+(2 or more) queries which will be much more efficient. We also have access to
+features such as optimistic and pessimistic locking and aggregate functions.
+
+The short description of the methods useful for building the queries is as
+follows:
+
+* `where` - defines the query condition(s)
+* `order` - defines the query order
+* `select` - defines the fields that will be returned (all by default)
+* `limit` - defines the maximal number of results
+* `offset` - defines the results offset
+* `includes` - eagerly loads associations
+* `group` - groups results by given attribute
+* `having` - defines the query condition(s) in case the results are grouped
+
+TODO
+
 * migrations
 * associations
 * inheritance
@@ -210,4 +243,5 @@ raise an exception.
 
 4. Write tests that will show the validations are defined correctly.
 
-* extensive list of query language examples
+  TODO
+  * extensive list of query language examples
