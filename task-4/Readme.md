@@ -186,12 +186,10 @@ follows:
 TODO
 
 * migrations
-* associations
 * inheritance
 * validations
 * callbacks
 * pagination
-* plugins
 * testing + infinite protocol of AR
 * security (SQL-injection, `attr_accessible`, etc.)
 * nullDB
@@ -199,7 +197,6 @@ TODO
 ## Exercises
 
 1. Write migrations that will define tables for the following models:
-
   * `User` with the following fields:
     * `name` - the name of the user
     * `surname` - the surname of the user
@@ -213,9 +210,7 @@ TODO
     * `description` - the description of the item
     * `date_due` - the date the item has to be completed
     * `todo_list_id` - the list this item belongs to
-
   Select the appropriate column types and indices for the tables.
-
 
 2. Define the classes and their associations:
   * a `User` has many `TodoList`s
@@ -242,6 +237,5 @@ TODO
     * should have a due date in dd/mm/yyyy format, that might be empty
 
 4. Write tests that will show the validations are defined correctly.
-
   TODO
   * extensive list of query language examples
