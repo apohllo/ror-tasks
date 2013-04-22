@@ -19,12 +19,12 @@ topics, that are not covered in Rails documentation.
 
 ### CRUD 
 
-The first feature of ActiveRecord is CRUD interface for the persistence layer:
+The first feature of ActiveRecord is CRUD interface for the persistence layer.
 
-Definition
+Definition:
 
 ```ruby
-# migration
+# schema migration
 class CreateBooks < ActiveRecord::Migration
   def change
     create_table :books do |t|
@@ -43,8 +43,14 @@ class Book < ActiveRecord::Base
 end
 ```
 
+AR allows to define database schema changes as schema migrations, i.e. pieces of
+Ruby code that describe how the schema have to change if the migration is
+applied.
 
-Create
+On the class part, the definition is very short, as the only requirement is
+inheriting from the `ActiveRecord::Base` class.
+
+Create:
 
 ```ruby
 book = Book.new(:title => 'Ruby')
@@ -63,6 +69,26 @@ end
 { :title => 'Ruby' }
 ```
 
+Creation of DB records might be achieved by instantiating Ruby objects of
+classes that inherit from AR::Base and calling their `save` method or by calling
+`create` method directly on the class. Both the constructor and the `create`
+method accept a hash of key-value pairs, that describe the values of the record
+columns. Appropriate conversion (from Ruby `String`) are performed on-the-fly.
+
+WARNING!
+
+The creation (and update) of objects via mass-assignment (i.e. passing a hash
+of values to `new` or `create` methods) is potentially dangerous, since an
+attacker might provide additional key-value pairs, that will grant him
+administrator privileges and similar. This problem was partially solved by
+introducing `attr_protected` macro in older versions of Rails. In the most
+recent version of Rails the black-list approach was changed to white-list
+approach so the developer has to define all mass-assignable attributes via
+`attr_accessible` macro. In the next (4.0) version of Rails this problem was
+further reduced by introduction of [strong-parameters
+mechanism](https://github.com/rails/strong_parameters) that operates on the
+controller level.
+
 Read:
 
 ```ruby
@@ -77,6 +103,13 @@ book = Book.find_by_title('Ruby')
 # or
 book = Book.where(:title => 'Ruby')
 ```
+
+By default all tables in the DB have a surrogate primary key called `id`. It
+uniquely identifies each object stored in the DB. Issuing `find` on the class
+returns the object with the `id` passed as its argument.
+
+The values of the columns are accessed via methods that are defined dynamically
+and by default are the same as the names of the columns.
 
 Update:
 
@@ -98,6 +131,11 @@ end
 { :title => 'Ruby for beginners' }
 ```
 
+Update of the values might be performed in several ways. The most popular is via
+an accessor and call to `save` or via call to `update` method, which works
+similar to the `create` method. Same as with `new` and `create`, `update` is
+subject to the mass-assignment problem.
+
 Destroy:
 
 ```ruby
@@ -109,6 +147,9 @@ Book.find(1)                      #=> error
 Book.find_by_id(1)                #=> nil
 ```
 
+Destroy call deletes given row from a database table. To make the mechanism less
+error prone, the object that was destroyed is frozen, so any changes to it will
+raise an exception.
 
 * query language
 * migrations
