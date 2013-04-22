@@ -197,6 +197,7 @@ TODO
 ## Exercises
 
 1. Write migrations that will define tables for the following models:
+
   * `User` with the following fields:
     * `name` - the name of the user
     * `surname` - the surname of the user
@@ -213,6 +214,7 @@ TODO
   Select the appropriate column types and indices for the tables.
 
 2. Define the classes and their associations:
+
   * a `User` has many `TodoList`s
   * a `User` has many `TodoItem`s through `TodoList`s
   * a `TodoList` belongs to a `User`
@@ -220,6 +222,7 @@ TODO
   * a `TodoItem` belongs to a `TodoList`
 
 3. Define validations for the following classes:
+
   * `User`
     * should have a non-empty `name` up to 20 characters long
     * should have a non-empty `surname` up to 30 characters long
