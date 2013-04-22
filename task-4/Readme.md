@@ -196,7 +196,9 @@ TODO
 
 ## Exercises
 
-1. Write migrations that will define tables for the following models:
+### Migrations
+
+Write migrations that will define tables for the following models:
 
   * `User` with the following fields:
     * `name` - the name of the user
@@ -213,7 +215,9 @@ TODO
     * `todo_list_id` - the list this item belongs to
   Select the appropriate column types and indices for the tables.
 
-2. Define the classes and their associations:
+### Definition and associations
+
+Define the classes and their associations:
 
   * a `User` has many `TodoList`s
   * a `User` has many `TodoItem`s through `TodoList`s
@@ -221,7 +225,9 @@ TODO
   * a `TodoList` has many `TodoItem`s
   * a `TodoItem` belongs to a `TodoList`
 
-3. Define validations for the following classes:
+### Validations
+
+Define validations for the following classes:
 
   * `User`
     * should have a non-empty `name` up to 20 characters long
@@ -239,6 +245,6 @@ TODO
     * should have a description up to 255 characters long that might be empty
     * should have a due date in dd/mm/yyyy format, that might be empty
 
-4. Write tests that will show the validations are defined correctly.
-  TODO
-  * extensive list of query language examples
+Write tests that will show the validations are defined correctly.
+
+### TODO - extensive list of query language examples
