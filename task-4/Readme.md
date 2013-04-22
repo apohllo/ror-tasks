@@ -29,19 +29,19 @@ Write about:
 
 1. Write migrations that will define tables for the following models:
 
-** `User` with the following fields:
-*** `name` - the name of the user
-*** `surname` - the surname of the user
-*** `email` - the e-mail address of the user
-*** `password` - the encrypted password of the user
-** `TodoList` with the following fields:
-*** `title` - the title of the TodoList (e.g. prive, work, etc.)
-*** `user_id`  - the id of the owner of the list
-** `TodoItem` with the following fields:
-*** `title` - the title of the item
-*** `description` - the description of the item
-*** `date_due` - the date the item has to be completed
-*** `todo_list_id` - the list this item belongs to
+  * `User` with the following fields:
+    * `name` - the name of the user
+    * `surname` - the surname of the user
+    * `email` - the e-mail address of the user
+    * `password` - the encrypted password of the user
+  * `TodoList` with the following fields:
+    * `title` - the title of the TodoList (e.g. prive, work, etc.)
+    * `user_id`  - the id of the owner of the list
+  * `TodoItem` with the following fields:
+    * `title` - the title of the item
+    * `description` - the description of the item
+    * `date_due` - the date the item has to be completed
+    * `todo_list_id` - the list this item belongs to
 
 Select the appropriate column types and indices for the tables.
 
