@@ -9,7 +9,7 @@ Prerequisites:
 
 ## Introduction
 
-'ActiveRecord' (AR in short) is the Rails ORM (Object-Relational Mapper). It is
+*ActiveRecord* (AR in short) is the Rails ORM (Object-Relational Mapper). It is
 used to simplify the access to the database, by hiding SQL-commands and data
 conversion behind an object-oriented interface. There is a lot of references
 describing AR (e.g. [Rails API](http://api.rubyonrails.org/), 
@@ -205,6 +205,8 @@ Write migrations that will define tables for the following models:
     * `surname` - the surname of the user
     * `email` - the e-mail address of the user
     * `password` - the encrypted password of the user
+    * `failed_login_count` - the number of times given user failed to log into
+      the system (starts with 0)
   * `TodoList` with the following fields:
     * `title` - the title of the TodoList (e.g. prive, work, etc.)
     * `user_id`  - the id of the owner of the list
@@ -236,6 +238,7 @@ Define validations for the following classes:
     * should accepts the `terms of the service`
     * should have a non-empty `password` that is at leas 10 characters long
     * should have confirmed his/her `password`
+    * should have non-empty integer `failed_login_count`
   * `TodoList`
     * should have a non-empty `title`
     * should have a non-empty `user` it belongs to
@@ -247,4 +250,30 @@ Define validations for the following classes:
 
 Write tests that will show the validations are defined correctly.
 
-### TODO - extensive list of query language examples
+### Query language
+
+Write tests for and implement the following data access methods:
+
+  * `User`
+    * find user by `surname`
+    * find user by `email`
+    * find user by prefix of his/her `surname`
+    * authenticate user using `email` and `password` (should use password encryption)
+    * find suspicious users with more than 2 `failed_login_count`s
+    * group users by number of failed login attempts
+  * `TodoList`
+    * find list by prefix of the `title`
+    * find all lists that belong to a given `User`
+    * find list by `id` eagerly loading its `ListItem`s
+  * `TodoItem`
+    * find items with a specific word in a description (not just a substring)
+    * find items with description exceeding 100 characters
+    * paginate items with 5 items per page and order them by title
+    * find all items that belong to a given user (use eager loading)
+    * find items that belong to a specific user that are due to midnight of a
+      specific day
+    * find items that are due for a specific day
+    * find items that are due for a specific week
+    * find items that are due for a specific month
+    * find items that are overdue (what about current date?)
+    * find items that are due in the next *n* hours
