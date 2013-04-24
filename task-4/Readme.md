@@ -196,6 +196,39 @@ TODO
 
 ## Exercises
 
+Before starting writing the exercises create and switch to `task-4` branch:
+  `git checkout -b task-4 
+  
+and install all the required libraries:
+
+  `bundle`
+
+We do not use full Rails stack to simplify the test set-up and to speed them up.
+
+There is a `Rakefile` in the main directory that defines the following tasks:
+
+* `db:migrate` - migrate the schema database
+* `db:clear` - delete the database (and migrate the schema)
+* `test` - run tests
+
+So if you want to run the migrations type:
+
+  `rake db:migrate`
+
+and the migrations will be invoked.
+
+The tests should be placed in `test` directory. Read the `test/book.rb`
+simple test to see how you can interact with the environment. You can use
+fixtures which must be placed in `test/fixtures` directory. The name of a file
+must be the same as the name of the table in the database and end with `.yml`
+(e.g.  `test/fixtures/books.yml`).
+
+To load the fixtures at each test you have to use the `TestHelper` module.
+It has to be included in the test definition (see `test/book.rb` for details).
+In most of the tests you will need more than one class. You can create a file
+that will require all model files to simplify set up.
+
+
 ### Migrations
 
 Write migrations that will define tables for the following models:
@@ -277,3 +310,7 @@ Write tests for and implement the following data access methods:
     * find items that are due for a specific month
     * find items that are overdue (what about current date?)
     * find items that are due in the next *n* hours
+
+Each finder method should be available in the appropriate class interface and
+expressed in domain-specific language (e.g. `find_suspicious_users`). Do not use
+generic AR finders in the tests. Make sure the methods are SQL-injection proof.
