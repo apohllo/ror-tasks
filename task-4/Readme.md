@@ -197,6 +197,7 @@ TODO
 ## Exercises
 
 Before starting writing the exercises create and switch to `task-4` branch:
+
   `git checkout -b task-4 
   
 and install all the required libraries:
@@ -207,8 +208,8 @@ We do not use full Rails stack to simplify the test set-up and to speed them up.
 
 There is a `Rakefile` in the main directory that defines the following tasks:
 
-* `db:migrate` - migrate the schema database
-* `db:clear` - delete the database (and migrate the schema)
+* `db:migrate` - migrate the database schema
+* `db:clear` - delete the database (and migrate)
 * `test` - run tests
 
 So if you want to run the migrations type:
@@ -218,7 +219,7 @@ So if you want to run the migrations type:
 and the migrations will be invoked.
 
 The tests should be placed in `test` directory. Read the `test/book.rb`
-simple test to see how you can interact with the environment. You can use
+test to see how you can interact with the environment. You can use
 fixtures which must be placed in `test/fixtures` directory. The name of a file
 must be the same as the name of the table in the database and end with `.yml`
 (e.g.  `test/fixtures/books.yml`).
@@ -226,7 +227,7 @@ must be the same as the name of the table in the database and end with `.yml`
 To load the fixtures at each test you have to use the `TestHelper` module.
 It has to be included in the test definition (see `test/book.rb` for details).
 In most of the tests you will need more than one class. You can create a file
-that will require all model files to simplify set up.
+that will require all model files to simplify test set up.
 
 
 ### Migrations
