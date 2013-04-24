@@ -1,0 +1,27 @@
+require 'bundler/setup'
+require 'active_record'
+require 'yaml'
+
+db_config = YAML::load_file("config/db.yml")
+
+task :setup_db do
+  ActiveRecord::Base.establish_connection(db_config)
+end
+
+namespace :db do
+  desc "Migrate the DB schema"
+  task :migrate => :setup_db do
+    ActiveRecord::Migrator.migrate("db/migrate",nil)
+  end
+
+  desc "Clear the DB"
+  task :clear do
+    sh "rm #{db_config[:database]}" if File.exist?(db_config[:database])
+    Rake::Task['db:migrate'].invoke
+  end
+end
+
+desc "Run tests"
+task :test do
+  sh "bundle exec rspec test/*"
+end
