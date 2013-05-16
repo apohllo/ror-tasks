@@ -118,10 +118,10 @@ book = Book.find(1)
 book.title = 'Ruby for beginners'
 book.save
 # or
-Book.update(:title => 'Ruby for beginners')
+Book.update_attributes(:title => 'Ruby for beginners')
 
 # In the controller context
-if Book.update(params[:book])
+if Book.update_attributes(params[:book])
   # success
 else
   # failure
@@ -132,9 +132,9 @@ end
 ```
 
 Update of the values might be performed in several ways. The most popular is via
-an accessor and call to `save` or via call to `update` method, which works
-similar to the `create` method. Same as with `new` and `create`, `update` is
-subject to the mass-assignment problem.
+an accessor and call to `save` or via call to `update_attributes` method, which
+works similar to the `create` method. Same as with `new` and `create`,
+`update_attributes` is subject to the mass-assignment problem.
 
 #### Destroy
 
@@ -198,13 +198,11 @@ TODO
 
 Before starting writing the exercises create and switch to `task-4` branch:
 
-  `git checkout -b task-4 
+  `git checkout -b task-4`
   
 and install all the required libraries:
 
   `bundle`
-
-We do not use full Rails stack to simplify the test set-up and to speed them up.
 
 There is a `Rakefile` in the main directory that defines the following tasks:
 
@@ -227,7 +225,7 @@ must be the same as the name of the table in the database and end with `.yml`
 To load the fixtures at each test you have to use the `TestHelper` module.
 It has to be included in the test definition (see `test/book.rb` for details).
 In most of the tests you will need more than one class. You can create a file
-that will require all model files to simplify test set up.
+that will require all model files to simplify the test set up.
 
 
 ### Migrations
@@ -309,7 +307,7 @@ Write tests for and implement the following data access methods:
     * find items that are due for a specific day
     * find items that are due for a specific week
     * find items that are due for a specific month
-    * find items that are overdue (what about current date?)
+    * find items that are overdue (what about the current date?)
     * find items that are due in the next *n* hours
 
 Each finder method should be available in the appropriate class interface and
