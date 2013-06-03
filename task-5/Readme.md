@@ -88,4 +88,4 @@ pass as well.
 
 This exercise showed how you can implement the persistence layer, separating the
 slow integration tests from the fast specs. Use the same techniques in the
-implementation the `Wallet` project.
+`Wallet` project.
