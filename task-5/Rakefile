@@ -1,0 +1,45 @@
+require 'bundler/setup'
+require 'active_record'
+require 'yaml'
+
+db_config = YAML::load_file("config/db.yml")
+
+task :setup_db do
+  ActiveRecord::Base.establish_connection(db_config)
+end
+
+namespace :db do
+  desc "Migrate the DB schema"
+  task :migrate => :setup_db do
+    ActiveRecord::Migrator.migrate("db/migrate",nil)
+    Rake::Task['db:dump'].invoke
+  end
+
+  desc "Clear the DB"
+  task :clear do
+    sh "rm #{db_config[:database]}" if File.exist?(db_config[:database])
+    Rake::Task['db:migrate'].invoke
+  end
+
+  desc "Dump the DB schema"
+  task :dump => :setup_db do
+    require 'active_support/core_ext/class'
+    File.open("db/schema.rb","w") do |output|
+      ActiveRecord::SchemaDumper.dump(ActiveRecord::Base.connection,output)
+    end
+  end
+end
+
+namespace :test do
+  desc "Run specs"
+  task :spec do
+    sh "bundle exec rspec test/spec/*"
+  end
+
+  desc "Run integration test"
+  task :int do
+    sh "bundle exec rspec test/integration/*"
+  end
+
+  task :all => [:spec,:int]
+end
