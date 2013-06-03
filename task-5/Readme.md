@@ -1,4 +1,4 @@
-# Implementation of the persistence layer with ActiveRecord #
+# Implementation of the persistence layer
 
 ## Introduction ##
 
@@ -13,25 +13,27 @@ This will cover integration tests, fixtures, nullDB, FactoryGirl (?)
 Before starting the exercises switch to the `task-2` branch, then create and
 switch to the `task-5` branch and pull changes from the `apohllo` repository:
 
+```
   git checkout task-2
   git checkout -b task-5
   git pull apohllo master
+```
 
 Then install all the required libraries:
 
-  bundle
+  `bundle`
 
 There is a Rakefile in the main directory that defines the following tasks:
 
-* db:migrate - migrate the database schema
-* db:clear - delete the database (and migrate)
-* test:spec - run specs
-* test:int - run integration tests
-* test:all - run all test
+* `db:migrate` - migrate the database schema
+* `db:clear` - delete the database (and migrate)
+* `test:spec` - run specs
+* `test:int` - run integration tests
+* `test:all` - run all test
 
 So if you want to run the migrations type:
 
-rake db:migrate
+  `rake db:migrate`
 
 and the migrations will be invoked.
 
